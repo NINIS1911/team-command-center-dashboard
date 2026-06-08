@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nini's Command Center — Live</title>
+    <title>Nini's Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -37,36 +36,198 @@
             gap: 8px;
         }
 
+        /* ─── ANIMATIONS ─── */
         @keyframes pulse-red   { 0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,0)} 50%{box-shadow:0 0 14px 4px rgba(248,81,73,0.5)} }
         @keyframes pulse-dot   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+        @keyframes flash-border{ 0%,100%{border-color:rgba(248,81,73,0.2)} 50%{border-color:rgba(248,81,73,0.65)} }
         @keyframes glow-green  { 0%,100%{box-shadow:0 0 5px rgba(63,185,80,0.4)} 50%{box-shadow:0 0 14px rgba(63,185,80,0.9)} }
         @keyframes glow-accent { 0%,100%{box-shadow:0 0 5px rgba(88,166,255,0.3)} 50%{box-shadow:0 0 16px rgba(88,166,255,0.7)} }
         @keyframes slide-in    { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes win-pulse   { 0%,100%{border-color:rgba(88,166,255,0.3)} 50%{border-color:rgba(88,166,255,0.7)} }
 
-        header { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        /* ─── HEADER ─── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
         .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon { font-size: 22px; }
         .logo-text h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; }
-        .logo-text p { font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; font-weight: 700; margin-top: 2px; }
+        .logo-text p  { font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; font-weight: 700; margin-top: 2px; }
         .header-right { text-align: right; }
         #clock { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -1px; }
         #date-display { font-size: 11px; color: var(--text-2); font-weight: 500; }
 
         .divider { height: 1px; background: var(--border); flex-shrink: 0; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
-        .card-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-        .card-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); }
-        .card-pill { font-size: 9px; padding: 2px 8px; border-radius: 20px; font-weight: 600; background: rgba(88,166,255,0.1); color: var(--accent); }
 
-        .main-grid { display: grid; grid-template-columns: 1fr 240px 200px; gap: 8px; flex: 1; min-height: 0; }
-        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr 250px; gap: 8px; flex-shrink: 0; height: 185px; }
-        .right-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+        /* ─── WIN CONDITION BANNER ─── */
+        .win-row {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            align-items: stretch;
+            height: 44px;
+        }
+        .win-banner {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid rgba(88,166,255,0.3);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: win-pulse 3s ease infinite;
+        }
+        .win-label {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+        .win-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-1);
+            flex: 1;
+        }
+        .win-set-label {
+            font-size: 9px;
+            color: var(--text-3);
+            white-space: nowrap;
+        }
 
+        /* ─── WEEK PROGRESS ─── */
+        .week-progress {
+            width: 210px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .wp-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-2);
+            white-space: nowrap;
+        }
+        .wp-days {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+        }
+        .wp-day {
+            flex: 1;
+            height: 8px;
+            border-radius: 3px;
+            background: var(--border);
+        }
+        .wp-day.past   { background: var(--green); }
+        .wp-day.today  { background: var(--accent); animation: glow-accent 2s ease infinite; }
+        .wp-day.future { background: var(--border); }
+        .wp-day-label {
+            font-size: 9px;
+            color: var(--text-2);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* ─── MAIN GRID ─── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 240px 200px;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ─── BOTTOM GRID ─── */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 250px;
+            gap: 8px;
+            flex-shrink: 0;
+            height: 185px;
+        }
+
+        /* ─── CARD ─── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .card-title {
+            font-size: 9px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-2);
+        }
+        .card-pill {
+            font-size: 9px; padding: 2px 8px; border-radius: 20px;
+            font-weight: 600; background: rgba(88,166,255,0.1); color: var(--accent);
+        }
+        .card.alert { animation: flash-border 2.5s ease infinite; border-color: rgba(248,81,73,0.2); }
+
+        /* ─── TODAY'S FOCUS ─── */
+        .today-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .today-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 7px;
+        }
+        .today-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+            animation: pulse-dot 1.8s ease infinite;
+        }
+        .today-who  { font-size: 10px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+        .today-task { font-size: 11px; font-weight: 500; color: var(--text-1); flex: 1; }
+
+        /* ─── TEAM PRIORITIES ─── */
         .team-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
         .team-member-card { display: flex; flex-direction: column; gap: 6px; }
-        .member-header { display: flex; align-items: center; gap: 8px; padding-bottom: 7px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .avatar { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #fff; flex-shrink: 0; }
-        .av-tech { background: linear-gradient(135deg, #0ea5e9, #6366f1); }
+        .member-header {
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 7px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+        }
+        .avatar {
+            width: 28px; height: 28px; border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 11px; color: #fff; flex-shrink: 0;
+        }
+        .av-tech    { background: linear-gradient(135deg, #0ea5e9, #6366f1); }
         .av-duffles { background: linear-gradient(135deg, #f59e0b, #ef4444); }
         .member-info { flex: 1; min-width: 0; }
         .member-name { font-size: 13px; font-weight: 700; }
@@ -75,38 +236,270 @@
         .mp-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; }
         .mp-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
         .mp-label { font-size: 9px; font-weight: 700; min-width: 26px; text-align: right; }
-
-        .priority-items { display: flex; flex-direction: column; gap: 4px; flex: 0 1 auto; overflow-y: auto; }
-        .priority-item { display: flex; align-items: center; gap: 7px; padding: 8px 9px; border-radius: 6px; background: rgba(255,255,255,0.02); border: 1px solid transparent; flex: 1; }
-        .priority-item:hover { background: rgba(88,166,255,0.04); border-color: rgba(88,166,255,0.1); }
-        .priority-item.s-done { opacity: 0.4; }
-        .priority-item.s-done .p-text { text-decoration: line-through; color: var(--text-2); }
+        .priority-items { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; justify-content: space-between; }
+        .priority-item {
+            display: flex; align-items: center; gap: 7px;
+            padding: 8px 9px; border-radius: 6px;
+            background: rgba(255,255,255,0.02); border: 1px solid transparent;
+            flex: 1;
+        }
+        .priority-item.s-active   { border-color: rgba(88,166,255,0.25);  background: rgba(88,166,255,0.05); }
+        .priority-item.s-todo     { border-color: rgba(255,255,255,0.04); }
+        .priority-item.s-waiting  { border-color: rgba(210,153,34,0.25);  background: rgba(210,153,34,0.05); }
+        .priority-item.s-upcoming { border-color: rgba(163,113,247,0.25); background: rgba(163,113,247,0.05); }
+        .priority-item.s-done     { opacity: 0.4; }
         .p-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+        .s-active   .p-dot { background: var(--accent);  animation: pulse-dot 2s ease infinite; }
+        .s-todo     .p-dot { background: var(--text-3); }
+        .s-waiting  .p-dot { background: var(--yellow);  animation: pulse-dot 2.5s ease infinite; }
+        .s-upcoming .p-dot { background: var(--purple); }
+        .s-done     .p-dot { background: var(--green); }
         .p-text { font-size: 11px; font-weight: 500; line-height: 1.3; flex: 1; }
-        .p-badge { font-size: 8px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; align-self: center; }
+        .p-badge {
+            font-size: 8px; font-weight: 700; text-transform: uppercase;
+            padding: 1px 5px; border-radius: 3px; flex-shrink: 0; align-self: center;
+        }
+        .badge-active   { background: rgba(88,166,255,0.15);  color: var(--accent); }
+        .badge-waiting  { background: rgba(210,153,34,0.15);  color: var(--yellow); }
+        .badge-upcoming { background: rgba(163,113,247,0.15); color: var(--purple); }
+        .badge-done     { background: rgba(63,185,80,0.15);   color: var(--green);  }
 
+        /* ─── PROJECT HEALTH ─── */
+        .project-list { display: flex; flex-direction: column; gap: 5px; flex: 1; overflow: hidden; }
+        .project-item {
+            display: flex; align-items: center; gap: 9px;
+            padding: 8px 11px; border-radius: 7px;
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+        }
+        .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .dot-green  { background: var(--green);  animation: glow-green 2.5s ease infinite; }
+        .dot-yellow { background: var(--yellow); box-shadow: 0 0 7px rgba(210,153,34,0.6); }
+        .dot-red    { background: var(--red);    animation: pulse-red 1.5s ease infinite; }
+        .dot-gray   { background: var(--text-3); }
+        .project-info { flex: 1; min-width: 0; }
+        .project-name { font-size: 12px; font-weight: 600; }
+        .project-note { font-size: 10px; color: var(--text-2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .project-owner {
+            font-size: 9px; color: var(--text-2);
+            background: var(--bg); border: 1px solid var(--border);
+            padding: 2px 6px; border-radius: 20px; flex-shrink: 0;
+        }
+
+        /* ─── RIGHT COL ─── */
+        .right-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+
+        /* ─── MULTIPLE COUNTDOWNS ─── */
+        .countdown-list { display: flex; flex-direction: column; gap: 6px; flex: 1; overflow: hidden; }
+        .countdown-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 7px 10px; border-radius: 7px;
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+        }
+        .countdown-item.primary {
+            background: rgba(88,166,255,0.05);
+            border-color: rgba(88,166,255,0.2);
+        }
+        .cd-num {
+            font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums;
+            line-height: 1; min-width: 44px; text-align: right;
+        }
+        .cd-num.primary { color: var(--accent); text-shadow: 0 0 20px rgba(88,166,255,0.4); }
+        .cd-num.tbd     { color: var(--text-3); font-size: 18px; }
+        .cd-info { flex: 1; min-width: 0; }
+        .cd-label { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cd-sub   { font-size: 9px; color: var(--text-2); margin-top: 1px; }
+
+        /* ─── TRIGGERS ─── */
+        .trigger-list { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; }
+        .trigger-item { display: flex; align-items: center; gap: 7px; }
+        .t-check {
+            width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--text-3);
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px;
+        }
+        .t-check.checked { background: var(--green); border-color: var(--green); color: #fff; animation: glow-green 2s ease infinite; }
+        .t-label { font-size: 10px; color: var(--text-2); line-height: 1.3; }
+
+        /* ─── DEADLINES ─── */
+        .deadline-list { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; }
+        .deadline-item { display: flex; align-items: center; gap: 7px; }
+        .dl-date { font-size: 9px; font-weight: 700; color: var(--text-2); min-width: 36px; text-transform: uppercase; }
+        .deadline-item.urgent .dl-date { color: var(--red); }
+        .deadline-item.urgent {
+            animation: flash-border 2s ease infinite;
+            background: rgba(248,81,73,0.04); padding: 3px 6px; border-radius: 5px;
+            border: 1px solid rgba(248,81,73,0.2);
+        }
+        .dl-text { font-size: 11px; color: var(--text-1); flex: 1; }
+        .urgent-pill {
+            font-size: 8px; background: rgba(248,81,73,0.15); color: var(--red);
+            border: 1px solid rgba(248,81,73,0.4); padding: 1px 5px; border-radius: 3px;
+            font-weight: 700; text-transform: uppercase; animation: pulse-dot 1.2s ease infinite;
+        }
+
+        /* ─── WINS ─── */
+        .wins-list { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; }
+        .win-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 500; }
+        .win-item span:last-child { color: var(--text-1); }
+
+        /* ─── BLOCKERS ─── */
+        .blockers-list { display: flex; flex-direction: column; gap: 5px; flex: 1; overflow: hidden; }
+        .blocker-item {
+            display: flex; align-items: center; gap: 7px;
+            padding: 4px 8px; border-radius: 6px;
+            background: rgba(248,81,73,0.05); border: 1px solid rgba(248,81,73,0.15);
+            animation: flash-border 3s ease infinite;
+        }
+        .blocker-icon { color: var(--red); font-size: 10px; flex-shrink: 0; }
+        .blocker-text { font-size: 11px; font-weight: 600; flex: 1; }
+        .blocker-owner {
+            font-size: 8px; color: var(--red);
+            background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.25);
+            padding: 1px 5px; border-radius: 10px; font-weight: 700;
+        }
+        .red-label {
+            font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--red); background: rgba(248,81,73,0.12);
+            border: 1px solid rgba(248,81,73,0.3); padding: 1px 5px; border-radius: 3px;
+        }
+
+        /* ─── TEAM PERFORMANCE ─── */
+        .perf-panel { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+        .perf-score-row { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .ring-wrap { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
         .ring-wrap svg { transform: rotate(-90deg); }
-        .ring-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+        .ring-bg   { fill: none; stroke: var(--border); stroke-width: 5; }
         .ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1.2s ease; }
-        .ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums; }
+        .ring-label {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums;
+        }
+        .perf-meta { flex: 1; }
+        .perf-title { font-size: 13px; font-weight: 800; line-height: 1; }
+        .perf-sub   { font-size: 9px; color: var(--text-2); margin-top: 2px; }
+        .velocity-row {
+            display: flex; align-items: center; gap: 6px;
+            padding: 4px 9px; border-radius: 6px;
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .vel-icon { font-size: 10px; }
+        .vel-text { font-size: 10px; font-weight: 600; color: var(--text-1); flex: 1; }
+        .vel-week { font-size: 9px; color: var(--text-2); }
+        .perf-members { display: flex; flex-direction: column; gap: 5px; flex: 1; overflow: hidden; }
+        .perf-member-row { display: flex; flex-direction: column; gap: 3px; }
+        .perf-member-label { display: flex; justify-content: space-between; font-size: 10px; }
+        .perf-member-name { font-weight: 600; color: var(--text-1); }
+        .perf-member-pct  { font-weight: 700; }
+        .perf-bar-bg { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .perf-bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s ease; }
 
-        .tab-nav { display: flex; gap: 8px; flex-shrink: 0; padding: 0 0 8px 0; border-bottom: 1px solid var(--border); }
-        .tab-btn { padding: 6px 14px; border: none; background: transparent; color: var(--text-2); cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border-bottom: 2px solid transparent; }
-        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        /* ─── PM PIPELINE ─── */
+        .pipeline-card {
+            flex-shrink: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+        .pipeline-header {
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        .pipeline-table { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+        .pipeline-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.2fr 1.5fr 2fr;
+            gap: 8px;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+        }
+        .pipeline-row.header-row {
+            background: transparent; border-color: transparent;
+            padding: 0 8px;
+        }
+        .pl-cell { font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pl-head { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-3); }
+        .stage-pill {
+            font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+            background: rgba(88,166,255,0.1); color: var(--accent); white-space: nowrap;
+            display: inline-block;
+        }
+        .est-mrr { font-size: 11px; font-weight: 700; color: var(--green); }
+
+        /* ─── MOTIVATIONAL ANCHOR ─── */
+        .motivational {
+            flex-shrink: 0;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-3);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 2px 0;
+        }
+
+        /* ─── TAB SYSTEM ─── */
+        .tab-nav {
+            display: flex; gap: 8px; flex-shrink: 0;
+            padding: 0 0 8px 0; border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            padding: 6px 14px; border: none; background: transparent;
+            color: var(--text-2); cursor: pointer; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--accent); border-bottom-color: var(--accent);
+        }
         .tab-btn:hover { color: var(--text-1); }
-        .tab-content { display: none !important; flex: 1; min-height: 0; flex-direction: column; gap: 8px; overflow: hidden; }
-        .tab-content.active { display: flex !important; }
+        .tab-content {
+            display: none !important;
+            flex: 1;
+            min-height: 0;
+            flex-direction: column;
+            gap: 8px;
+            overflow: hidden;
+        }
+        .tab-content.active {
+            display: flex !important;
+        }
 
-        .priority-button { width: 28px; height: 28px; border-radius: 4px; border: 1.5px solid var(--text-3); background: transparent; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: inherit; }
-        .priority-button.done { border-color: var(--green); background: var(--green); }
-
-        .loading { text-align: center; padding: 20px; color: var(--text-2); }
+        /* ─── PERSONAL TO-DO LIST ─── */
+        .todo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; overflow: hidden; }
+        .todo-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+            padding: 11px 14px; display: flex; flex-direction: column; gap: 6px; overflow: hidden;
+        }
+        .todo-list { display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; }
+        .todo-item {
+            display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 6px;
+            background: rgba(255,255,255,0.02); border: 1px solid transparent; transition: all 0.2s;
+        }
+        .todo-item:hover { background: rgba(88,166,255,0.04); border-color: rgba(88,166,255,0.1); }
+        .todo-item.done { opacity: 0.5; }
+        .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-2); }
+        .todo-check {
+            width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--text-3);
+            flex-shrink: 0; margin-top: 2px; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 10px; transition: all 0.2s;
+        }
+        .todo-item.done .todo-check { background: var(--green); border-color: var(--green); color: #fff; }
+        .todo-item:hover .todo-check { border-color: var(--accent); }
+        .todo-text { font-size: 11px; font-weight: 500; line-height: 1.35; flex: 1; color: var(--text-1); }
+        .todo-summary { display: flex; align-items: center; gap: 6px; padding: 8px; background: rgba(88,166,255,0.04); border: 1px solid rgba(88,166,255,0.15); border-radius: 6px; }
+        .todo-count { font-size: 12px; font-weight: 700; color: var(--accent); }
+        .todo-label { font-size: 11px; color: var(--text-2); }
     </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ══════════ HEADER ══════════ -->
 <header>
     <div class="logo">
         <span class="logo-icon">🧠</span>
@@ -123,20 +516,43 @@
 
 <div class="divider"></div>
 
-<!-- TAB NAVIGATION -->
+<!-- ══════════ TAB NAVIGATION ══════════ -->
 <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('team', this)">🧠 Team Command Center</button>
     <button class="tab-btn" onclick="switchTab('techlead', this)">👨‍💼 Tech Lead</button>
     <button class="tab-btn" onclick="switchTab('duffles', this)">👜 Duffles</button>
-    <button class="tab-btn" onclick="switchTab('reminders', this)">🔔 Team Reminders</button>
+    <button class="tab-btn" onclick="switchTab('todos', this)">✅ Personal To-Dos</button>
 </div>
 
-<!-- TEAM TAB -->
+<!-- ══════════ TEAM TAB (MAIN DASHBOARD) ══════════ -->
 <div id="team-tab" class="tab-content active">
+
+<!-- ══════════ WIN CONDITION + WEEK PROGRESS ══════════ -->
+<div class="win-row">
+    <div class="win-banner">
+        <span class="win-label">⚡ This week we win if</span>
+        <span class="win-text" id="win-text">—</span>
+        <span class="win-set-label">Set every Monday</span>
+    </div>
+    <div class="week-progress">
+        <span class="wp-label" id="wp-label">Day — of 5</span>
+        <div class="wp-days" id="wp-days"></div>
+    </div>
+</div>
+
+<!-- ══════════ MAIN GRID ══════════ -->
+<div class="main-grid">
+
+    <!-- COL 1: TODAY'S FOCUS + WEEKLY PRIORITIES -->
     <div class="card">
         <div class="card-header">
             <span class="card-title">🎯 Weekly Priorities</span>
+            <span class="card-pill" id="week-label">Week of —</span>
         </div>
+        <!-- TODAY'S FOCUS -->
+        <div class="today-section" id="today-section"></div>
+        <div class="divider"></div>
+        <!-- WEEKLY PRIORITIES -->
         <div class="team-columns">
             <div class="team-member-card">
                 <div class="member-header">
@@ -168,141 +584,534 @@
             </div>
         </div>
     </div>
+
+    <!-- COL 2: PROJECT HEALTH -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🚦 Project Health</span>
+        </div>
+        <div class="project-list" id="project-list"></div>
+    </div>
+
+    <!-- COL 3: COUNTDOWNS + DEADLINES -->
+    <div class="right-col">
+        <div class="card" style="flex:1.2">
+            <div class="card-header">
+                <span class="card-title">⏳ Countdowns</span>
+            </div>
+            <div class="countdown-list" id="countdown-list"></div>
+            <div class="divider"></div>
+            <div class="trigger-list" id="trigger-list"></div>
+        </div>
+        <div class="card alert" style="flex:1">
+            <div class="card-header">
+                <span class="card-title">📅 Deadlines</span>
+                <span class="red-label">⚠ WATCH</span>
+            </div>
+            <div class="deadline-list" id="deadline-list"></div>
+        </div>
+    </div>
+
 </div>
 
-<!-- TECH LEAD TAB -->
-<div id="techlead-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
+<!-- ══════════ BOTTOM GRID ══════════ -->
+<div class="bottom-grid">
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">✅ Wins This Week</span>
+        </div>
+        <div class="wins-list" id="wins-list"></div>
+    </div>
+
+    <div class="card alert">
+        <div class="card-header">
+            <span class="card-title">🔴 Active Blockers</span>
+            <span class="red-label">NEEDS ACTION</span>
+        </div>
+        <div class="blockers-list" id="blockers-list"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">📊 Team Performance</span>
+            <span class="card-pill">This Week</span>
+        </div>
+        <div class="perf-panel">
+            <div class="perf-score-row">
+                <div class="ring-wrap">
+                    <svg width="52" height="52" viewBox="0 0 52 52">
+                        <circle class="ring-bg"   cx="26" cy="26" r="21"/>
+                        <circle class="ring-fill" cx="26" cy="26" r="21"
+                            id="ring-fill"
+                            stroke="var(--green)"
+                            stroke-dasharray="131.9"
+                            stroke-dashoffset="131.9"/>
+                    </svg>
+                    <div class="ring-label" id="ring-label">0%</div>
+                </div>
+                <div class="perf-meta">
+                    <div class="perf-title" id="perf-title">—</div>
+                    <div class="perf-sub"   id="perf-sub">—</div>
+                </div>
+            </div>
+            <div class="velocity-row">
+                <span class="vel-icon">⚡</span>
+                <span class="vel-text" id="vel-today">0 shipped today</span>
+                <span class="vel-week" id="vel-week">0 this week</span>
+            </div>
+            <div class="perf-members" id="perf-members"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══════════ PM PIPELINE ══════════ -->
+<div class="pipeline-card">
+    <div class="pipeline-header">
+        <span class="card-title">🏠 PM Pipeline</span>
+        <span class="card-pill" id="pipeline-label">— potential leads</span>
+    </div>
+    <div class="pipeline-table">
+        <div class="pipeline-row header-row">
+            <span class="pl-head">Owner / Contact</span>
+            <span class="pl-head">Units</span>
+            <span class="pl-head">Est. MRR</span>
+            <span class="pl-head">Stage</span>
+            <span class="pl-head">Next Step</span>
+        </div>
+        <div id="pipeline-rows"></div>
+    </div>
+</div>
+
+<!-- ══════════ MOTIVATIONAL ANCHOR ══════════ -->
+<div class="motivational" id="motivational">—</div>
+
+</div> <!-- END TEAM TAB -->
+
+<!-- ══════════ TECH LEAD TAB ══════════ -->
+<div id="techlead-tab" class="tab-content" style="flex-direction: column; gap: 8px; overflow-y: auto;">
     <div class="card">
         <div class="card-header">
             <span class="card-title">👨‍💼 Tech Lead Dashboard</span>
+            <span class="card-pill" id="tl-week-label">Week of —</span>
         </div>
-        <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-shrink: 0;">
             <div class="ring-wrap">
                 <svg width="52" height="52" viewBox="0 0 52 52">
-                    <circle class="ring-bg" cx="26" cy="26" r="21"/>
-                    <circle class="ring-fill" cx="26" cy="26" r="21" id="tl-ring" stroke="var(--green)" stroke-dasharray="131.9" stroke-dashoffset="131.9"/>
+                    <circle class="ring-bg"   cx="26" cy="26" r="21"/>
+                    <circle class="ring-fill" cx="26" cy="26" r="21"
+                        id="tl-ring-fill"
+                        stroke="var(--green)"
+                        stroke-dasharray="131.9"
+                        stroke-dashoffset="131.9"/>
                 </svg>
                 <div class="ring-label" id="tl-ring-label">0%</div>
             </div>
-            <div style="flex:1;">
-                <div style="font-size:13px; font-weight:700; color:var(--text-1);" id="tl-label">—</div>
-                <div style="font-size:10px; color:var(--text-2); margin-top:2px;" id="tl-sub">—</div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-1);" id="tl-perf-title">—</div>
+                <div style="font-size: 10px; color: var(--text-2); margin-top: 2px;" id="tl-perf-sub">—</div>
             </div>
         </div>
         <div class="divider"></div>
-        <div class="priority-items" id="p-techlead-detail"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2);">📋 Current Work</div>
+            <div class="priority-items" id="p-techlead-detail"></div>
+        </div>
     </div>
 
-    <div class="card" style="flex:1; min-height:0; overflow-y:auto;">
+    <div class="card" style="flex: 1; min-height: 0; overflow-y: auto;">
         <div class="card-header">
-            <span class="card-title">🤖 AI Email System</span>
+            <span class="card-title">🤖 AI Email System Implementation</span>
             <span class="card-pill" id="tech-pill">0% — 6 phases</span>
         </div>
-        <div id="ai-phases" style="display:flex; flex-direction:column; gap:6px;"></div>
+        <div id="ai-phases-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
     </div>
-</div>
+</div> <!-- END TECH LEAD TAB -->
 
-<!-- DUFFLES TAB -->
-<div id="duffles-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
+<!-- ══════════ DUFFLES TAB ══════════ -->
+<div id="duffles-tab" class="tab-content" style="flex-direction: column; gap: 8px; overflow-y: auto;">
     <div class="card">
         <div class="card-header">
             <span class="card-title">👜 Duffles — Gael</span>
+            <span class="card-pill" id="gael-week-label">Week of —</span>
         </div>
-        <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-shrink: 0;">
             <div class="ring-wrap">
                 <svg width="52" height="52" viewBox="0 0 52 52">
-                    <circle class="ring-bg" cx="26" cy="26" r="21"/>
-                    <circle class="ring-fill" cx="26" cy="26" r="21" id="dh-ring" stroke="var(--green)" stroke-dasharray="131.9" stroke-dashoffset="131.9"/>
+                    <circle class="ring-bg"   cx="26" cy="26" r="21"/>
+                    <circle class="ring-fill" cx="26" cy="26" r="21"
+                        id="gael-ring-fill"
+                        stroke="var(--green)"
+                        stroke-dasharray="131.9"
+                        stroke-dashoffset="131.9"/>
                 </svg>
-                <div class="ring-label" id="dh-ring-label">0%</div>
+                <div class="ring-label" id="gael-ring-label">0%</div>
             </div>
-            <div style="flex:1;">
-                <div style="font-size:13px; font-weight:700; color:var(--text-1);" id="dh-label">—</div>
-                <div style="font-size:10px; color:var(--text-2); margin-top:2px;" id="dh-sub">—</div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-1);" id="gael-perf-title">—</div>
+                <div style="font-size: 10px; color: var(--text-2); margin-top: 2px;" id="gael-perf-sub">—</div>
             </div>
         </div>
         <div class="divider"></div>
-        <div class="priority-items" id="p-duffles-detail"></div>
-    </div>
-</div>
-
-<!-- TEAM REMINDERS TAB -->
-<div id="reminders-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">🏆 Weekly Wins</span>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.4;">
-            <div>✅ Built Tier One PM Dashboard system</div>
-            <div>✅ All bank accounts routing real estate income</div>
-            <div>✅ Tech Lead follow-up completed</div>
-            <div>✅ CMO brand marketing follow-up completed</div>
-            <div>✅ Team meeting Friday — progress review + gap identification</div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2);">🎯 Current Work</div>
+            <div class="priority-items" id="p-duffles-detail"></div>
         </div>
     </div>
+</div> <!-- END DUFFLES TAB -->
 
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">🔴 Active Blockers</span>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.4;">
-            <div>▲ DRE exam date confirmation</div>
-            <div>▲ Gusto payroll setup</div>
-            <div>▲ QuickBooks setup</div>
-        </div>
+<!-- ══════════ PERSONAL TO-DOS TAB ══════════ -->
+<div id="todos-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
+
+    <!-- BACKUP/RESTORE CONTROLS -->
+    <div style="display:flex; gap:6px; flex-shrink:0; justify-content:flex-end;">
+        <button onclick="testSlackWebhook()" style="padding:6px 10px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:10px; cursor:pointer; font-family:inherit; transition:all 0.2s;" title="Test Slack connection">
+            🧪 Test Slack
+        </button>
+        <button onclick="exportPersonalState()" style="padding:6px 10px; background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.2); border-radius:6px; color:var(--green); font-weight:700; font-size:10px; cursor:pointer; font-family:inherit; transition:all 0.2s;" title="Download backup">
+            💾 Export
+        </button>
+        <button onclick="importPersonalState()" style="padding:6px 10px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:10px; cursor:pointer; font-family:inherit; transition:all 0.2s;" title="Restore from backup">
+            📥 Import
+        </button>
+        <button onclick="manualSavePersonalData()" style="padding:6px 10px; background:rgba(210,153,34,0.1); border:1px solid rgba(210,153,34,0.2); border-radius:6px; color:var(--yellow); font-weight:700; font-size:10px; cursor:pointer; font-family:inherit; transition:all 0.2s;" title="Force save to browser storage">
+            💫 Save Now
+        </button>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">📋 Meeting Notes & Action Items</span>
+    <!-- PERSONAL PROGRESS BANNER -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; flex-shrink:0;">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">📊 Progress</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
+                <div class="perf-score-row" style="gap:8px;">
+                    <div class="ring-wrap">
+                        <svg width="52" height="52" viewBox="0 0 52 52">
+                            <circle class="ring-bg"   cx="26" cy="26" r="21"/>
+                            <circle class="ring-fill" cx="26" cy="26" r="21"
+                                id="personal-ring-fill"
+                                stroke="var(--green)"
+                                stroke-dasharray="131.9"
+                                stroke-dashoffset="131.9"/>
+                        </svg>
+                        <div class="ring-label" id="personal-ring-label">0%</div>
+                    </div>
+                    <div class="perf-meta">
+                        <div class="perf-title" id="personal-perf-title">—</div>
+                        <div class="perf-sub" id="personal-perf-sub">—</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; line-height:1.4;">
-            <div style="padding:8px; background:rgba(88,166,255,0.05); border-radius:6px; border:1px solid rgba(88,166,255,0.1);">
-                <div style="font-weight:700; margin-bottom:4px;">Friday Team Meeting</div>
-                <div>- Reviewed progress on PM company setup</div>
-                <div>- Identified gaps in workflow automation</div>
-                <div>- Next: Attorney meeting on 5/29</div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">⚡ Velocity</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px; flex:1; justify-content:center;">
+                <div style="font-size:24px; font-weight:900; color:var(--green);" id="personal-vel-today">0</div>
+                <div style="font-size:10px; color:var(--text-2);">shipped today</div>
+                <div style="font-size:20px; font-weight:800; margin-top:4px;" id="personal-vel-week">0</div>
+                <div style="font-size:10px; color:var(--text-2);">this week</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">🎯 Status</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px; flex:1; justify-content:center;">
+                <div style="font-size:13px; font-weight:700; line-height:1.2;" id="personal-status">—</div>
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">⚡ Next Week's Focus</span>
+    <!-- MAIN GRID: TASKS + WINS/BLOCKERS -->
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px; flex:1; min-height:0; overflow:hidden;">
+        <!-- TASK LIST CARD -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">🏠 Your To-Dos</span>
+            </div>
+            <!-- ADD NEW TO-DO INPUT -->
+            <div style="display:flex; gap:6px; flex-shrink:0;">
+                <input type="text" id="new-todo-input" placeholder="Add new task..."
+                    style="flex:1; padding:7px 10px; background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.15); border-radius:6px; color:var(--text-1); font-size:11px; font-family:inherit;"
+                    onkeypress="if(event.key==='Enter') addNewTodo()">
+                <button onclick="addNewTodo()" style="padding:7px 12px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:11px; cursor:pointer; font-family:inherit; transition:all 0.2s;">
+                    Add
+                </button>
+            </div>
+            <div class="todo-list" id="todo-list-main" style="flex:1; overflow-y:auto;"></div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.4;">
-            <div>→ Broker license — await DRE exam date</div>
-            <div>→ AI PM Dashboard — continue build</div>
-            <div>→ Duffles — video shoot + marketing push</div>
-            <div>→ Acquisitions — restart June 15</div>
+
+        <!-- RIGHT COLUMN: WINS + BLOCKERS + REMINDERS -->
+        <div style="display:flex; flex-direction:column; gap:8px; min-height:0; overflow-y:auto;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">✅ Personal Wins</span>
+                </div>
+                <div class="wins-list" id="personal-wins-list"></div>
+            </div>
+            <div class="card alert">
+                <div class="card-header">
+                    <span class="card-title">🔴 Blockers</span>
+                </div>
+                <div class="blockers-list" id="personal-blockers-list"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📌 Reminders</span>
+                </div>
+                <!-- ADD NEW REMINDER INPUT -->
+                <div style="display:flex; gap:6px; flex-shrink:0;">
+                    <input type="text" id="new-reminder-input" placeholder="Add reminder..."
+                        style="flex:1; padding:7px 10px; background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.15); border-radius:6px; color:var(--text-1); font-size:11px; font-family:inherit;"
+                        onkeypress="if(event.key==='Enter') addNewReminder()">
+                    <button onclick="addNewReminder()" style="padding:7px 12px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:11px; cursor:pointer; font-family:inherit; transition:all 0.2s;">
+                        Add
+                    </button>
+                </div>
+                <div class="todo-list" id="reminder-list-main" style="flex:1; overflow-y:auto;"></div>
+            </div>
         </div>
     </div>
-</div>
 
+</div> <!-- END TODOS TAB -->
+
+<!-- ══════════════════════════════════════════════════════════
+     📋  DASHBOARD DATA  —  EDIT THIS SECTION TO UPDATE BOARD
+     ══════════════════════════════════════════════════════════ -->
 <script type="module">
 import { ConvexClient } from "https://esm.sh/convex@latest/browser";
-const CONVEX_URL = "https://adventurous-squid-490.convex.cloud";
-const convex = new ConvexClient(CONVEX_URL);
+const convex = new ConvexClient("https://adventurous-squid-490.convex.cloud");
 
-const CIRCUMFERENCE = 2 * Math.PI * 21;
+const DATA = {
+    lastUpdated: "May 24, 2026",
+
+    // ── SLACK WEBHOOK (for reminder notifications) ──
+    // Stored in Convex (not in this public repo) so the secret isn't exposed.
+    // Loaded at runtime via the Convex merge below; leave blank here.
+    slackWebhook: "",
+
+    // ── WIN CONDITION (set every Monday) ──
+    winCondition: "Tech Lead confirms AppFolio API access + Gael completes brand brief review and competitor audit",
+
+    // ── MOTIVATIONAL ANCHOR ──
+    motivationalLine: "Build freedom through money and leverage.",
+
+    // ── TODAY'S FOCUS (update every morning in standup) ──
+    today: {
+        techLead: "Read Tier 1 MD file — connect AppFolio to bank accounts",
+        duffles:  "Start 4-week content calendar draft"
+    },
+
+    // ── VELOCITY (update daily — how many tasks shipped) ──
+    velocity: {
+        today:    3,
+        thisWeek: 4
+    },
+
+    // ── TEAM PRIORITIES ──
+    // STATUS OPTIONS: "active" | "todo" | "waiting" | "upcoming" | "done"
+    team: {
+        techLead: [
+            { text: "AppFolio API received",                 status: "todo"   },
+            { text: "Read Tier 1 MD file (already built)",   status: "todo" },
+            { text: "Build Tier 1 for PM company",           status: "todo"   },
+            { text: "Tier 2 — follow up with Nini",          status: "todo"   }
+        ],
+        duffles: [
+            { text: "Brand brief review + competitor audit", status: "todo"   },
+            { text: "Instagram + TikTok setup",              status: "todo"   },
+            { text: "4-week content calendar draft",         status: "todo" },
+            { text: "Hat drop pre-launch marketing plan",    status: "todo"   },
+            { text: "Confirm two new hat designs.",          status: "todo" },
+            { text: "All hat designs shipped?",              status: "todo" },
+            { text: "June 7th video shoot, plan revise.",    status: "todo" }
+        ]
+    },
+
+    // ── PROJECT HEALTH ──
+    // STATUS OPTIONS: "green" | "yellow" | "red" | "gray"
+    projects: [
+        { name: "AI PM System",   status: "yellow", owner: "Tech Lead", note: "AppFolio + dashboard in build"  },
+        { name: "Broker License", status: "yellow", owner: "Me",        note: "Waiting on DRE exam date"       },
+        { name: "Pilot License",  status: "yellow", owner: "Me",        note: "Training starts May 29"         },
+        { name: "Duffles",        status: "green",  owner: "Gael",      note: "Onboarding Monday 5/25"         },
+        { name: "Acquisitions",   status: "gray",   owner: "Me",        note: "Paused — restart June 15"       }
+    ],
+
+    // ── COUNTDOWNS ──
+    // Set date to null if TBD — shows "TBD" instead of a number
+    // Add more countdowns here when real dates are confirmed
+    countdowns: [
+        { label: "Acquisitions Restart", date: "2026-06-15", sub: "June 15, 2026", primary: true }
+    ],
+
+    // ── JUNE 15 TRIGGERS ──
+    june15Triggers: [
+        { text: "Weekly accountability rhythm running", done: true  },
+        { text: "AI-PM dashboard live",                 done: false },
+        { text: "Broker license in hand",               done: false }
+    ],
+
+    // ── DEADLINES ──
+    deadlines: [
+        { date: "5/24",  text: "EDD CA Employer Account # — awaiting mail", urgent: false },
+        { date: "5/29",  text: "PM Attorney meeting (online)",               urgent: false },
+        { date: "5/29",  text: "Pilot training begins",                      urgent: false },
+        { date: "6/7",   text: "Duffles video shoot",                        urgent: false },
+        { date: "6/15",  text: "Acquisitions restart",                       urgent: false },
+        { date: "8/15",  text: "$800 CA franchise tax due",                  urgent: false }
+    ],
+
+    // ── WINS ──
+    wins: [
+        "AppFolio API received — build unblocked",
+        "All 4 Columbia Bank accounts open",
+        "Instagram + TikTok live — Duffles accounts set up",
+        "CPA locked (AppFolio integrated)",
+        "PM company setup complete"
+    ],
+
+    // ── BLOCKERS ──
+    blockers: [
+        { text: "Gusto payroll setup",         owner: "Me"        },
+        { text: "QuickBooks setup",            owner: "Me"        },
+        { text: "Connect AppFolio to bank",    owner: "Tech Lead" },
+        { text: "DRE exam date",               owner: "DRE"       }
+    ],
+
+    // ── PM PIPELINE ──
+    pipeline: [
+        { owner: "Portfolio Owner (TBD)",  units: "TBD", estMRR: "TBD",  stage: "Meeting scheduled", next: "Close terms + unit count" }
+    ],
+
+    // ── PERSONAL TO-DO LIST ──
+    personalTodos: [
+        { text: "Order stackable washer/dryer for 4153 Idaho St", done: false },
+        { text: "Trash can update for 428 Street — contact city about trash can", done: false },
+        { text: "Follow up on quotes for 428th St plumbing issues", done: false },
+        { text: "Follow up on quote for A St — contractor quotes received?", done: false },
+        { text: "Pest control invoice due — Breeza Bros. $400", done: false },
+        { text: "Write lease for 2266 Oceanview Blvd (start 6/10/2026) + follow up with new tenant", done: false },
+        { text: "Ocean View marketing — photos, listing agreements, list on SDMLS", done: false },
+        { text: "Flipe Anza invoice — Grand View trees / Beta St tree service", done: false },
+        { text: "HANOVER dump fee for Victor — $450", done: false },
+        { text: "Schedule last of stucco fix for A St", done: false },
+        { text: "Bank account signing/opening at Columbia Bank — tomorrow 10:30am", done: false }
+    ],
+
+    // ── PERSONAL WINS & BLOCKERS ──
+    personalWins: [
+        "CPA locked (AppFolio integrated)",
+        "PM company setup complete",
+        "All 4 Columbia Bank accounts open"
+    ],
+
+    personalBlockers: [
+        { text: "Gusto payroll setup", owner: "Me" },
+        { text: "QuickBooks setup", owner: "Me" },
+        { text: "DRE exam date confirmation", owner: "DRE" }
+    ],
+
+    // ── PERSONAL VELOCITY ──
+    personalVelocity: {
+        today: 0,
+        thisWeek: 0
+    },
+
+    // ── PERSONAL REMINDERS ──
+    personalReminders: [
+        { text: "Paid $250 out of pocket for 4153 Idaho St job — needs reimbursement", done: false }
+    ],
+
+    // ── TECH LEAD: AI EMAIL SYSTEM TASKS ──
+    techTasks: [
+        { phase: "Phase 1: Email Infrastructure", tasks: [
+            { text: "Create business email account for AI (ai@[company].com)", done: false },
+            { text: "Set up email inbox environment (Gmail, Outlook, or custom)", done: false },
+            { text: "Configure email forwarding rules for meter readings", done: false },
+            { text: "Set up automated end-of-month meter reading processing", done: false },
+            { text: "Create email filters/labels for different incoming types", done: false }
+        ]},
+        { phase: "Phase 2: Nextiva Integration", tasks: [
+            { text: "Connect Nextiva phone system to email system", done: false },
+            { text: "Set up call-to-email transcription (if available)", done: false },
+            { text: "Create automated routing for maintenance requests from calls", done: false },
+            { text: "Log all Nextiva interactions to AI email inbox", done: false },
+            { text: "Set up alerts for urgent maintenance calls", done: false }
+        ]},
+        { phase: "Phase 3: Data Aggregation", tasks: [
+            { text: "Create maintenance log aggregation system", done: false },
+            { text: "Collect all maintenance requests into central AI inbox", done: false },
+            { text: "Set up automated parsing of maintenance logs", done: false },
+            { text: "Create database/tracker for all incoming maintenance data", done: false },
+            { text: "Set up automated categorization (urgent/routine/preventive)", done: false }
+        ]},
+        { phase: "Phase 4: Personal Dashboard Reflection", tasks: [
+            { text: "Create AI Activity dashboard section", done: false },
+            { text: "Display meter readings (monthly summary + trends)", done: false },
+            { text: "Show pending maintenance requests (status tracking)", done: false },
+            { text: "Track maintenance request response times", done: false },
+            { text: "Display Nextiva call logs & interactions", done: false },
+            { text: "Show AI automation stats", done: false }
+        ]},
+        { phase: "Phase 5: Automation Workflows", tasks: [
+            { text: "End-of-month meter reading email trigger", done: false },
+            { text: "Automated maintenance request assignment", done: false },
+            { text: "Auto-response system for incoming maintenance emails", done: false },
+            { text: "Monthly summary report generation", done: false },
+            { text: "Slack integration (send maintenance alerts to Slack)", done: false }
+        ]},
+        { phase: "Phase 6: Backup & Sync", tasks: [
+            { text: "Update bank accounts to AppFolio", done: false },
+            { text: "Back up all AI email data to AppFolio", done: false },
+            { text: "Sync maintenance data with property management system", done: false },
+            { text: "Set up data sync to personal dashboard (real-time or daily)", done: false },
+            { text: "Create export/reporting templates", done: false }
+        ]}
+    ]
+};
+// ══════════════════════════════════════════════════════════
+//  END DATA
+// ══════════════════════════════════════════════════════════
+
+// ── Convex: load persisted state and merge over defaults (or seed on first run) ──
+// Top-level await guarantees DATA is hydrated BEFORE any rendering runs below.
+const _saved = await convex.query("dashboard:get", {});
+if (_saved) {
+    Object.assign(DATA, _saved);
+} else {
+    DATA._rev = 1;
+    await convex.mutation("dashboard:set", { value: DATA });
+}
+let _myRev = DATA._rev || 0;
+
 const $ = id => document.getElementById(id);
+const CIRCUMFERENCE = 2 * Math.PI * 21;
 
 function scoreColor(pct) {
-    if (pct === 0) return 'var(--accent)';
-    if (pct >= 70) return 'var(--green)';
-    if (pct >= 40) return 'var(--yellow)';
+    if (pct === 0)  return 'var(--accent)';
+    if (pct >= 70)  return 'var(--green)';
+    if (pct >= 40)  return 'var(--yellow)';
     return 'var(--red)';
 }
-
 function scoreLabel(pct) {
-    if (pct === 0) return '🚀 Week Starting';
-    if (pct >= 80) return '🔥 Crushing It';
-    if (pct >= 60) return '✅ On Track';
-    if (pct >= 40) return '⚡ Needs Push';
+    if (pct === 0)  return '🚀 Week Starting';
+    if (pct >= 80)  return '🔥 Crushing It';
+    if (pct >= 60)  return '✅ On Track';
+    if (pct >= 40)  return '⚡ Needs Push';
     return '🔴 Falling Behind';
 }
+function calcPct(items) {
+    if (!items.length) return 0;
+    return Math.round(items.filter(i => i.status === 'done').length / items.length * 100);
+}
 
-// Clock
+// ── Clock ──
 function updateClock() {
     const n = new Date(), pad = v => String(v).padStart(2,'0');
     $('clock').textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
@@ -313,202 +1122,862 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Tab switching
-window.switchTab = function(tabName, btnEl) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    const tabEl = $(tabName + '-tab');
-    if (tabEl) tabEl.classList.add('active');
-    if (btnEl) btnEl.classList.add('active');
-};
+// ── Win Condition ──
+$('win-text').textContent = DATA.winCondition;
 
-// Load priorities from Convex
-async function loadPriorities() {
-    try {
-        const techLeadPriorities = await convex.query("priorities:getPriorities", { team: "techLead" });
-        const dufflesPriorities = await convex.query("priorities:getPriorities", { team: "duffles" });
+// ── Motivational Anchor ──
+$('motivational').textContent = `"${DATA.motivationalLine}"`;
 
-        renderPriorities('p-techlead', techLeadPriorities);
-        renderPriorities('p-duffles', dufflesPriorities);
-        renderPriorities('p-techlead-detail', techLeadPriorities);
-        renderPriorities('p-duffles-detail', dufflesPriorities);
+// ── Week Label ──
+const _n = new Date();
+const _mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+$('week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
 
-        updateProgress('techLead', techLeadPriorities);
-        updateProgress('duffles', dufflesPriorities);
-    } catch (e) {
-        console.error('Failed to load priorities:', e);
-    }
-}
+// ── Week Progress Bar ──
+(function() {
+    const day = _n.getDay(); // 0=Sun, 1=Mon ... 5=Fri, 6=Sat
+    const workDay = (day === 0 || day === 6) ? 5 : day; // weekend = show as Friday
+    const labels = ['M','T','W','T','F'];
+    const days = ['wp-days'];
+    $('wp-label').textContent = `Day ${workDay} of 5`;
+    $('wp-days').innerHTML = labels.map((l, i) => {
+        const d = i + 1;
+        let cls = d < workDay ? 'past' : d === workDay ? 'today' : 'future';
+        return `<div class="wp-day ${cls}" title="${['Mon','Tue','Wed','Thu','Fri'][i]}"></div>`;
+    }).join('');
+})();
 
+// ── Today's Focus ──
+$('today-section').innerHTML = `
+    <div class="today-item">
+        <div class="today-dot"></div>
+        <span class="today-who">TL Today</span>
+        <span class="today-task">${DATA.today.techLead}</span>
+    </div>
+    <div class="today-item">
+        <div class="today-dot"></div>
+        <span class="today-who">Gael Today</span>
+        <span class="today-task">${DATA.today.duffles}</span>
+    </div>`;
+
+// ── Priorities ──
+const BADGE = { active:'badge-active', waiting:'badge-waiting', upcoming:'badge-upcoming', done:'badge-done' };
+const BADGE_TEXT = { active:'Active', waiting:'Waiting', upcoming:'Soon', done:'Done' };
 function renderPriorities(id, items) {
-    $(id).innerHTML = (items || []).map((p, idx) => {
+    $(id).innerHTML = items.map((p, idx) => {
+        const badge = BADGE[p.status]
+            ? `<span class="p-badge ${BADGE[p.status]}">${BADGE_TEXT[p.status]}</span>` : '';
         const isDone = p.status === 'done';
-        return `<div class="priority-item s-${p.status}">
+        return `<div class="priority-item s-${p.status}" style="position: relative;">
             <div class="p-dot"></div>
             <span class="p-text">${p.text}</span>
-            <button class="priority-button ${isDone ? 'done' : ''}" onclick="togglePriority('${p.team}', '${p.text}', '${p.status}')" style="flex-shrink:0;">
+            <button onclick="togglePriorityStatus('${id}', ${idx})" style="flex-shrink: 0; width: 28px; height: 28px; border-radius: 4px; border: 1.5px solid ${isDone ? 'var(--green)' : 'var(--text-3)'}; background: ${isDone ? 'var(--green)' : 'transparent'}; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: inherit;">
                 ${isDone ? '✓' : ''}
             </button>
+            ${badge}
         </div>`;
     }).join('');
 }
+renderPriorities('p-techlead', DATA.team.techLead);
+renderPriorities('p-duffles',  DATA.team.duffles);
 
-window.togglePriority = async function(team, text, currentStatus) {
-    const newStatus = currentStatus === 'done' ? 'todo' : 'done';
-    try {
-        await convex.mutation("priorities:updatePriority", { team, text, status: newStatus });
-        await loadPriorities();
-    } catch (e) {
-        console.error('Failed to update priority:', e);
+// ── Member progress bars ──
+function setMemberBar(barId, pctId, items) {
+    const pct = calcPct(items), color = scoreColor(pct);
+    setTimeout(() => { $(barId).style.width = pct + '%'; $(barId).style.background = color; }, 300);
+    $(pctId).textContent = pct + '%';
+    $(pctId).style.color = color;
+}
+setMemberBar('bar-tl', 'pct-tl', DATA.team.techLead);
+setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles);
+
+// ── Projects ──
+const dotClass = { green:'dot-green', yellow:'dot-yellow', red:'dot-red', gray:'dot-gray' };
+$('project-list').innerHTML = DATA.projects.map(p => `
+    <div class="project-item">
+        <div class="status-dot ${dotClass[p.status]}"></div>
+        <div class="project-info">
+            <div class="project-name">${p.name}</div>
+            <div class="project-note">${p.note}</div>
+        </div>
+        <span class="project-owner">${p.owner}</span>
+    </div>`).join('');
+
+// ── Countdowns ──
+function daysUntil(dateStr) {
+    return Math.max(0, Math.ceil((new Date(dateStr) - new Date()) / 86400000));
+}
+$('countdown-list').innerHTML = DATA.countdowns.map(c => {
+    const isPrimary = c.primary;
+    const num = c.date ? daysUntil(c.date) : null;
+    return `<div class="countdown-item ${isPrimary ? 'primary' : ''}">
+        <span class="cd-num ${isPrimary ? 'primary' : 'tbd'}">${num !== null ? num : 'TBD'}</span>
+        <div class="cd-info">
+            <div class="cd-label">${c.label}</div>
+            <div class="cd-sub">${num !== null ? c.sub : c.sub}</div>
+        </div>
+    </div>`;
+}).join('');
+
+// ── June 15 Triggers ──
+$('trigger-list').innerHTML = DATA.june15Triggers.map(t => `
+    <div class="trigger-item">
+        <div class="t-check ${t.done ? 'checked' : ''}">${t.done ? '✓' : ''}</div>
+        <span class="t-label">${t.text}</span>
+    </div>`).join('');
+
+// ── Deadlines ──
+$('deadline-list').innerHTML = DATA.deadlines.map(d => `
+    <div class="deadline-item ${d.urgent ? 'urgent' : ''}">
+        <span class="dl-date">${d.date}</span>
+        <span class="dl-text">${d.text}</span>
+        ${d.urgent ? '<span class="urgent-pill">NOW</span>' : ''}
+    </div>`).join('');
+
+// ── Wins ──
+$('wins-list').innerHTML = DATA.wins.map(w => `
+    <div class="win-item"><span>✅</span><span>${w}</span></div>`).join('');
+
+// ── Blockers ──
+$('blockers-list').innerHTML = DATA.blockers.map(b => `
+    <div class="blocker-item">
+        <span class="blocker-icon">▲</span>
+        <span class="blocker-text">${b.text}</span>
+        <span class="blocker-owner">${b.owner}</span>
+    </div>`).join('');
+
+// ── Team Performance Ring ──
+const allItems   = [...DATA.team.techLead, ...DATA.team.duffles];
+const totalDone  = allItems.filter(i => i.status === 'done').length;
+const totalAll   = allItems.length;
+const overallPct = Math.round(totalDone / totalAll * 100);
+const color      = scoreColor(overallPct);
+const offset     = CIRCUMFERENCE - (overallPct / 100) * CIRCUMFERENCE;
+setTimeout(() => {
+    $('ring-fill').style.strokeDashoffset = offset;
+    $('ring-fill').style.stroke = color;
+}, 400);
+$('ring-label').textContent  = overallPct + '%';
+$('ring-label').style.color  = color;
+$('perf-title').textContent  = scoreLabel(overallPct);
+$('perf-title').style.color  = color;
+$('perf-sub').textContent    = `${totalDone} of ${totalAll} tasks done`;
+
+// ── Velocity ──
+$('vel-today').textContent = `${DATA.velocity.today} shipped today`;
+$('vel-today').style.color = DATA.velocity.today > 0 ? 'var(--green)' : 'var(--text-1)';
+$('vel-week').textContent  = `${DATA.velocity.thisWeek} this week`;
+
+// ── Per-member performance rows ──
+const members = [
+    { name: 'Tech Lead', items: DATA.team.techLead },
+    { name: 'Gael (CMO)', items: DATA.team.duffles }
+];
+$('perf-members').innerHTML = members.map((m, i) => {
+    const pct = calcPct(m.items), c = scoreColor(pct);
+    return `<div class="perf-member-row">
+        <div class="perf-member-label">
+            <span class="perf-member-name">${m.name}</span>
+            <span class="perf-member-pct" style="color:${c}">${pct}%</span>
+        </div>
+        <div class="perf-bar-bg">
+            <div class="perf-bar-fill" id="pm-bar-${i}" style="width:0%;background:${c}"></div>
+        </div>
+    </div>`;
+}).join('');
+members.forEach((m, i) => {
+    const pct = calcPct(m.items);
+    setTimeout(() => { $(`pm-bar-${i}`).style.width = pct + '%'; }, 500 + i * 100);
+});
+
+// ── PM Pipeline ──
+$('pipeline-label').textContent = `${DATA.pipeline.length} active lead${DATA.pipeline.length !== 1 ? 's' : ''}`;
+$('pipeline-rows').innerHTML = DATA.pipeline.map(p => `
+    <div class="pipeline-row">
+        <span class="pl-cell">${p.owner}</span>
+        <span class="pl-cell">${p.units}</span>
+        <span class="pl-cell est-mrr">${p.estMRR}</span>
+        <span class="pl-cell"><span class="stage-pill">${p.stage}</span></span>
+        <span class="pl-cell" style="color:var(--text-2)">${p.next}</span>
+    </div>`).join('');
+
+// ══════════════════════════════════════════════════════════
+// TAB SYSTEM & PERSONAL TO-DOS
+// ══════════════════════════════════════════════════════════
+
+// ── LocalStorage Persistence ──
+const STORAGE_KEY = 'nini-personal-todos';
+const VELOCITY_KEY = 'nini-personal-velocity';
+const WINS_KEY = 'nini-personal-wins';
+const BLOCKERS_KEY = 'nini-personal-blockers';
+const REMINDERS_KEY = 'nini-personal-reminders';
+const TECH_TASKS_KEY = 'nini-tech-tasks';
+
+function savePersonalData() {
+    // Persist the ENTIRE dashboard to Convex so every panel syncs across devices.
+    // Bump our revision so we don't reload ourselves when the change echoes back.
+    _myRev = (DATA._rev || 0) + 1;
+    DATA._rev = _myRev;
+    convex.mutation("dashboard:set", { value: DATA })
+        .catch(e => console.error('Convex sync failed:', e));
+}
+
+function loadPersonalData() {
+    // No-op: dashboard state is now loaded from Convex at startup (see top of script).
+    // localStorage is intentionally not read so stale local data can't overwrite Convex.
+}
+
+// Load data on page init
+loadPersonalData();
+
+// ── Slack Integration ──
+function sendToSlack(message) {
+    if (!DATA.slackWebhook) return; // Silent fail if no webhook
+
+    fetch(DATA.slackWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            text: message,
+            mrkdwn: true
+        })
+    }).catch(err => console.error('Slack send failed:', err));
+}
+
+function sendReminderToSlack(reminderText, action) {
+    const actions = {
+        added: `📌 *New Reminder Added*\n${reminderText}`,
+        completed: `✅ *Reminder Done*\n${reminderText}`,
+        deleted: `❌ *Reminder Removed*\n${reminderText}`
+    };
+    sendToSlack(actions[action] || reminderText);
+}
+
+// Daily 9 AM digest
+function scheduleDailyDigest() {
+    function checkAndSend() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+
+        // Fire at 9:00 AM
+        if (hours === 9 && minutes === 0) {
+            const reminders = DATA.personalReminders.filter(r => !r.done);
+            if (reminders.length > 0) {
+                const list = reminders.map((r, i) => `${i + 1}. ${r.text}`).join('\n');
+                sendToSlack(`🎯 *Daily Reminders (9 AM)*\n\n${list}\n\n_Check your dashboard to manage_`);
+            }
+        }
+    }
+
+    // Check every minute
+    setInterval(checkAndSend, 60000);
+}
+
+scheduleDailyDigest();
+
+// ── Full Sync to Slack (one-time initialization) ──
+function sendFullSyncToSlack() {
+    if (!DATA.slackWebhook) return;
+
+    // Build comprehensive sync message
+    const reminders = DATA.personalReminders.filter(r => !r.done);
+    const todos = DATA.personalTodos.filter(t => !t.done);
+    const wins = DATA.personalWins;
+    const blockers = DATA.personalBlockers;
+    const doneCount = DATA.personalTodos.filter(t => t.done).length;
+    const totalCount = DATA.personalTodos.length;
+    const pct = totalCount > 0 ? Math.round(doneCount / totalCount * 100) : 0;
+
+    let message = `🚀 *Full Dashboard Sync Started*\n\n`;
+
+    message += `📊 *Progress: ${pct}% Complete* (${doneCount}/${totalCount} done)\n\n`;
+
+    if (reminders.length > 0) {
+        message += `📌 *Pending Reminders:*\n`;
+        reminders.forEach((r, i) => {
+            message += `  ${i + 1}. ${r.text}\n`;
+        });
+        message += `\n`;
+    }
+
+    if (todos.length > 0) {
+        message += `✅ *Pending To-Dos:*\n`;
+        todos.forEach((t, i) => {
+            message += `  ${i + 1}. ${t.text}\n`;
+        });
+        message += `\n`;
+    }
+
+    if (wins.length > 0) {
+        message += `🏆 *Wins This Week:*\n`;
+        wins.forEach((w, i) => {
+            message += `  ${i + 1}. ${w}\n`;
+        });
+        message += `\n`;
+    }
+
+    if (blockers.length > 0) {
+        message += `🔴 *Active Blockers:*\n`;
+        blockers.forEach((b, i) => {
+            message += `  ${i + 1}. ${b.text} (_${b.owner}_)\n`;
+        });
+        message += `\n`;
+    }
+
+    message += `_Dashboard synced with Slack. All future updates will post in real-time._`;
+
+    sendToSlack(message);
+}
+
+// Auto full-sync on load is disabled: with real-time reloads it would spam Slack
+// on every change. Daily 9 AM digest (above) still runs.
+// if (DATA.slackWebhook) { setTimeout(sendFullSyncToSlack, 500); }
+
+// ── Tab Switching ──
+window.switchTab = function(tabName, btnEl) {
+    // Hide all tabs & deactivate all buttons
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    // Show selected tab & activate button
+    const tabEl = $(`${tabName}-tab`);
+    if (tabEl) {
+        tabEl.classList.add('active');
+    }
+    if (btnEl) {
+        btnEl.classList.add('active');
     }
 };
 
-function updateProgress(team, items) {
-    const done = items.filter(i => i.status === 'done').length;
-    const total = items.length;
+// ── Render Personal To-Dos ──
+function renderPersonalTodos() {
+    const todos = DATA.personalTodos;
+    const done = todos.filter(t => t.done).length;
+    const total = todos.length;
     const pct = total > 0 ? Math.round(done / total * 100) : 0;
-    const color = scoreColor(pct);
-    const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
 
-    if (team === 'techLead') {
-        const ring = $('tl-ring');
+    // Render to-do list
+    $('todo-list-main').innerHTML = todos.map((t, i) => `
+        <div class="todo-item ${t.done ? 'done' : ''}" id="todo-${i}">
+            <div class="todo-check" onclick="toggleTodo(${i})">
+                ${t.done ? '✓' : ''}
+            </div>
+            <div class="todo-text">${t.text}</div>
+            <button onclick="deleteTodo(${i})" style="flex-shrink:0; width:20px; height:20px; border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:12px; padding:0; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" title="Delete">
+                ✕
+            </button>
+        </div>
+    `).join('');
+
+    // Update progress ring
+    const ringColor = scoreColor(pct);
+    const ringOffset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+    setTimeout(() => {
+        const ring = $('personal-ring-fill');
         if (ring) {
-            ring.style.strokeDashoffset = offset;
-            ring.style.stroke = color;
+            ring.style.strokeDashoffset = ringOffset;
+            ring.style.stroke = ringColor;
         }
-        $('tl-ring-label').textContent = pct + '%';
-        $('tl-ring-label').style.color = color;
-        $('tl-label').textContent = scoreLabel(pct);
-        $('tl-label').style.color = color;
-        $('tl-sub').textContent = `${done} of ${total} tasks done`;
-        $('bar-tl').style.width = pct + '%';
-        $('bar-tl').style.background = color;
-        $('pct-tl').textContent = pct + '%';
-        $('pct-tl').style.color = color;
-    } else if (team === 'duffles') {
-        const ring = $('dh-ring');
-        if (ring) {
-            ring.style.strokeDashoffset = offset;
-            ring.style.stroke = color;
-        }
-        $('dh-ring-label').textContent = pct + '%';
-        $('dh-ring-label').style.color = color;
-        $('dh-label').textContent = scoreLabel(pct);
-        $('dh-label').style.color = color;
-        $('dh-sub').textContent = `${done} of ${total} tasks done`;
-        $('bar-dh').style.width = pct + '%';
-        $('bar-dh').style.background = color;
-        $('pct-dh').textContent = pct + '%';
-        $('pct-dh').style.color = color;
+    }, 100);
+    if ($('personal-ring-label')) $('personal-ring-label').textContent = pct + '%';
+    if ($('personal-ring-label')) $('personal-ring-label').style.color = ringColor;
+    if ($('personal-perf-title')) $('personal-perf-title').textContent = scoreLabel(pct);
+    if ($('personal-perf-title')) $('personal-perf-title').style.color = ringColor;
+    if ($('personal-perf-sub')) $('personal-perf-sub').textContent = `${done} of ${total} tasks done`;
+
+    // Update velocity
+    if ($('personal-vel-today')) $('personal-vel-today').textContent = DATA.personalVelocity.today;
+    if ($('personal-vel-week')) $('personal-vel-week').textContent = DATA.personalVelocity.thisWeek;
+    if ($('personal-vel-today')) $('personal-vel-today').style.color = DATA.personalVelocity.today > 0 ? 'var(--green)' : 'var(--text-1)';
+
+    // Update status
+    if ($('personal-status')) {
+        let status = 'In Progress';
+        if (pct === 0) status = '🚀 Week Starting';
+        else if (pct >= 80) status = '🔥 Crushing It';
+        else if (pct >= 60) status = '✅ On Track';
+        else if (pct >= 40) status = '⚡ Needs Push';
+        else status = '🔴 Falling Behind';
+        $('personal-status').textContent = status;
     }
+
+    // Render wins
+    $('personal-wins-list').innerHTML = DATA.personalWins.map(w => `
+        <div class="win-item"><span>✅</span><span>${w}</span></div>`).join('');
+
+    // Render blockers
+    $('personal-blockers-list').innerHTML = DATA.personalBlockers.map(b => `
+        <div class="blocker-item">
+            <span class="blocker-icon">▲</span>
+            <span class="blocker-text">${b.text}</span>
+            <span class="blocker-owner">${b.owner}</span>
+        </div>`).join('');
+
+    // Render reminders
+    $('reminder-list-main').innerHTML = DATA.personalReminders.map((r, i) => `
+        <div class="todo-item ${r.done ? 'done' : ''}" id="reminder-${i}">
+            <div class="todo-check" onclick="toggleReminder(${i})">
+                ${r.done ? '✓' : ''}
+            </div>
+            <div class="todo-text">${r.text}</div>
+            <button onclick="deleteReminder(${i})" style="flex-shrink:0; width:20px; height:20px; border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:12px; padding:0; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" title="Delete">
+                ✕
+            </button>
+        </div>
+    `).join('');
 }
 
-// Load AI tasks
-async function loadTasks() {
+window.toggleTodo = function(i) {
+    DATA.personalTodos[i].done = !DATA.personalTodos[i].done;
+    savePersonalData();
+    renderPersonalTodos();
+};
+
+window.deleteTodo = function(i) {
+    DATA.personalTodos.splice(i, 1);
+    savePersonalData();
+    renderPersonalTodos();
+};
+
+window.addNewTodo = function() {
+    const input = $('new-todo-input');
+    const text = input.value.trim();
+
+    if (!text) return; // Don't add empty tasks
+
+    // Add to array
+    DATA.personalTodos.push({ text: text, done: false });
+    savePersonalData();
+
+    // Clear input
+    input.value = '';
+    input.focus();
+
+    // Re-render
+    renderPersonalTodos();
+};
+
+// ── Personal Velocity & Wins Updaters ──
+window.addPersonalWin = function() {
+    const winText = prompt('What did you ship today?');
+    if (!winText) return;
+    DATA.personalWins.push(winText);
+    savePersonalData();
+    renderPersonalTodos();
+};
+
+window.updatePersonalVelocity = function(today, week) {
+    DATA.personalVelocity.today = today;
+    DATA.personalVelocity.thisWeek = week;
+    savePersonalData();
+    renderPersonalTodos();
+};
+
+// ── Reminder Management ──
+window.toggleReminder = function(i) {
+    DATA.personalReminders[i].done = !DATA.personalReminders[i].done;
+    const action = DATA.personalReminders[i].done ? 'completed' : 'uncompleted';
+    sendReminderToSlack(DATA.personalReminders[i].text, action === 'completed' ? 'completed' : 'added');
+    savePersonalData();
+    renderPersonalTodos();
+};
+
+window.deleteReminder = function(i) {
+    const reminderText = DATA.personalReminders[i].text;
+    DATA.personalReminders.splice(i, 1);
+    sendReminderToSlack(reminderText, 'deleted');
+    savePersonalData();
+    renderPersonalTodos();
+};
+
+window.addNewReminder = function() {
+    const input = $('new-reminder-input');
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    DATA.personalReminders.push({ text: text, done: false });
+    sendReminderToSlack(text, 'added');
+    savePersonalData();
+
+    input.value = '';
+    input.focus();
+
+    renderPersonalTodos();
+};
+
+// ── Test Slack Webhook ──
+window.testSlackWebhook = function() {
+    if (!DATA.slackWebhook) {
+        alert('❌ No Slack webhook configured');
+        return;
+    }
+
+    sendToSlack('🧪 *Test Message* — If you see this in Slack, the webhook is working!');
+    alert('✅ Test message sent! Check your Slack channel in a few seconds.');
+};
+
+// ── Manual Save Confirmation ──
+window.manualSavePersonalData = function() {
     try {
-        const tasks = await convex.query("tasks:getTasks", {});
-
-        // Group by phase
-        const phases = {};
-        tasks.forEach(t => {
-            if (!phases[t.phase]) phases[t.phase] = [];
-            phases[t.phase].push(t);
-        });
-
-        renderTasks(phases);
+        savePersonalData();
+        alert('✅ State saved to browser storage. You\'re backed up.');
     } catch (e) {
-        console.error('Failed to load tasks:', e);
+        alert('❌ Error saving: ' + e.message + '\n\nTry exporting as backup instead.');
     }
-}
+};
 
-function renderTasks(phases) {
-    const allTasks = Object.values(phases).flat();
-    const done = allTasks.filter(t => t.done).length;
-    const total = allTasks.length;
-    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+// ── Export State as JSON ──
+window.exportPersonalState = function() {
+    const state = {
+        exportDate: new Date().toISOString(),
+        todos: DATA.personalTodos,
+        velocity: DATA.personalVelocity,
+        wins: DATA.personalWins,
+        blockers: DATA.personalBlockers,
+        reminders: DATA.personalReminders
+    };
 
-    $('tech-pill').textContent = `${pct}% — 6 phases`;
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `personal-todos-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-    const phaseNames = [
-        "Phase 1: Email Infrastructure",
-        "Phase 2: Nextiva Integration",
-        "Phase 3: Data Aggregation",
-        "Phase 4: Personal Dashboard Reflection",
-        "Phase 5: Automation Workflows",
-        "Phase 6: Backup & Sync"
-    ];
+    alert('✅ Backup downloaded. Keep this file safe!');
+};
 
-    $('ai-phases').innerHTML = phaseNames.map((name, idx) => {
-        const phaseTasks = phases[idx] || [];
+// ── Import State from JSON ──
+window.importPersonalState = function() {
+    const json = prompt('Paste your backup JSON here:');
+    if (!json) return;
+
+    try {
+        const state = JSON.parse(json);
+        DATA.personalTodos = state.todos || [];
+        DATA.personalVelocity = state.velocity || { today: 0, thisWeek: 0 };
+        DATA.personalWins = state.wins || [];
+        DATA.personalBlockers = state.blockers || [];
+        DATA.personalReminders = state.reminders || [];
+
+        savePersonalData();
+        renderPersonalTodos();
+        alert('✅ State restored from backup!');
+    } catch (e) {
+        alert('❌ Invalid backup format: ' + e.message);
+    }
+};
+
+renderPersonalTodos();
+
+// ══════════════════════════════════════════════════════════
+// TECH DASHBOARD FUNCTIONS (STANDALONE CARD)
+// ══════════════════════════════════════════════════════════
+
+function renderTechDashboard() {
+    const phases = DATA.techTasks;
+    const allTasks = phases.flatMap(p => p.tasks);
+    const totalDone = allTasks.filter(t => t.done).length;
+    const totalTasks = allTasks.length;
+    const pct = totalTasks > 0 ? Math.round(totalDone / totalTasks * 100) : 0;
+
+    // ── Update main progress ring ──
+    const ringColor = scoreColor(pct);
+    const ringOffset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+    setTimeout(() => {
+        const ring = $('tech-main-ring');
+        if (ring) {
+            ring.style.strokeDashoffset = ringOffset;
+            ring.style.stroke = ringColor;
+        }
+    }, 100);
+    if ($('tech-main-label')) {
+        $('tech-main-label').textContent = pct + '%';
+        $('tech-main-label').style.color = ringColor;
+    }
+    if ($('tech-main-title')) {
+        $('tech-main-title').textContent = scoreLabel(pct);
+        $('tech-main-title').style.color = ringColor;
+    }
+    if ($('tech-main-sub')) {
+        $('tech-main-sub').textContent = `${totalDone} of ${totalTasks} tasks done`;
+    }
+    if ($('tech-progress-pill')) {
+        $('tech-progress-pill').textContent = `${pct}% — 6 phases`;
+    }
+
+    // ── Render all phases with collapsible tasks ──
+    $('tech-phases-list').innerHTML = phases.map((phase, phaseIdx) => {
+        const phaseTasks = phase.tasks;
         const phaseDone = phaseTasks.filter(t => t.done).length;
         const phasePct = phaseTasks.length > 0 ? Math.round(phaseDone / phaseTasks.length * 100) : 0;
-        const color = scoreColor(phasePct);
+        const phaseColor = scoreColor(phasePct);
 
-        return `<div style="padding:8px 10px; background:rgba(255,255,255,0.02); border-radius:6px; border:1px solid var(--border);">
-            <button onclick="togglePhaseExpand(${idx})" style="width:100%; padding:0; background:none; border:none; color:inherit; cursor:pointer; text-align:left; display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:700; font-family:inherit;">
-                <span style="color:var(--text-1);">${name}</span>
-                <span id="phase-icon-${idx}">▼</span>
-            </button>
-            <div style="display:flex; align-items:center; gap:6px; font-size:10px; margin-top:6px;">
-                <div style="flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
-                    <div style="height:100%; background:${color}; width:${phasePct}%; border-radius:2px;"></div>
-                </div>
-                <span style="color:var(--text-2);">${phaseDone}/${phaseTasks.length}</span>
-            </div>
-            <div id="phase-${idx}" style="display:none; flex-direction:column; gap:4px; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05);">
-                ${phaseTasks.map(t => `
-                    <div style="display:flex; align-items:center; gap:6px; padding:6px; border-radius:4px; background:${t.done ? 'rgba(63,185,80,0.08)' : 'transparent'}; cursor:pointer;" onclick="toggleTask(${t.phase}, ${t.taskIndex})">
-                        <input type="checkbox" ${t.done ? 'checked' : ''} style="width:14px; height:14px; cursor:pointer; accent-color:var(--green);" onchange="event.stopPropagation(); toggleTask(${t.phase}, ${t.taskIndex})">
-                        <span style="font-size:10px; flex:1; ${t.done ? 'text-decoration:line-through; color:var(--text-2);' : 'color:var(--text-1);'}">${t.text}</span>
+        return `
+            <div style="display:flex; flex-direction:column; gap:3px; padding:8px 10px; background:rgba(255,255,255,0.02); border-radius:6px; border:1px solid var(--border);">
+                <button onclick="togglePhaseExpand(${phaseIdx})" style="width:100%; padding:0; background:transparent; border:none; color:inherit; cursor:pointer; text-align:left; display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:700; font-family:inherit;">
+                    <span style="color:var(--text-1);">${phase.phase}</span>
+                    <span id="phase-icon-${phaseIdx}">▼</span>
+                </button>
+                <div style="display:flex; align-items:center; gap:6px; font-size:10px;">
+                    <div style="flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                        <div style="height:100%; background:${phaseColor}; width:${phasePct}%; border-radius:2px; transition:width 0.3s;"></div>
                     </div>
-                `).join('')}
+                    <span style="color:var(--text-2); font-weight:600;">${phaseDone}/${phaseTasks.length}</span>
+                </div>
+                <div id="phase-tasks-${phaseIdx}" style="display:none; flex-direction:column; gap:2px; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05);">
+                    ${phaseTasks.map((task, taskIdx) => `
+                        <div style="display:flex; align-items:flex-start; gap:6px; padding:6px; border-radius:4px; background:${task.done ? 'rgba(63,185,80,0.08)' : 'transparent'}; cursor:pointer; transition:background 0.2s;" onclick="toggleTechTask(${phaseIdx}, ${taskIdx})">
+                            <div style="width:16px; height:16px; border-radius:3px; border:1.5px solid ${task.done ? 'var(--green)' : 'var(--text-3)'}; background:${task.done ? 'var(--green)' : 'transparent'}; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; font-size:10px; color:#fff; font-weight:700;">
+                                ${task.done ? '✓' : ''}
+                            </div>
+                            <div style="font-size:10px; line-height:1.4; flex:1; ${task.done ? 'text-decoration:line-through; color:var(--text-2);' : 'color:var(--text-1);'}">${task.text}</div>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
-        </div>`;
+        `;
     }).join('');
 }
 
-window.togglePhaseExpand = function(idx) {
-    const phase = $(`phase-${idx}`);
-    const icon = $(`phase-icon-${idx}`);
-    const isHidden = phase.style.display === 'none';
-    phase.style.display = isHidden ? 'flex' : 'none';
+window.togglePhaseExpand = function(phaseIdx) {
+    const tasksList = $(`phase-tasks-${phaseIdx}`);
+    const icon = $(`phase-icon-${phaseIdx}`);
+    const isHidden = tasksList.style.display === 'none';
+    tasksList.style.display = isHidden ? 'flex' : 'none';
     icon.textContent = isHidden ? '▲' : '▼';
 };
 
-window.toggleTask = async function(phase, taskIdx) {
+window.toggleTechTask = function(phaseIdx, taskIdx) {
+    DATA.techTasks[phaseIdx].tasks[taskIdx].done = !DATA.techTasks[phaseIdx].tasks[taskIdx].done;
+    savePersonalData();
+    renderTechDashboard();
+};
+
+window.deleteTechTask = function(phaseIdx, taskIdx) {
+    DATA.techTasks[phaseIdx].tasks.splice(taskIdx, 1);
+    savePersonalData();
+    renderTechDashboard();
+};
+
+// ── Tech State Export/Import ──
+window.exportTechState = function() {
+    const state = {
+        exportDate: new Date().toISOString(),
+        techTasks: DATA.techTasks
+    };
+
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tech-dashboard-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert('✅ Tech dashboard backed up!');
+};
+
+window.importTechState = function() {
+    const json = prompt('Paste your tech dashboard backup JSON here:');
+    if (!json) return;
+
     try {
-        const tasks = await convex.query("tasks:getTasks", {});
-        const task = tasks.find(t => t.phase === phase && t.taskIndex === taskIdx);
-        if (task) {
-            await convex.mutation("tasks:updateTask", { phase, taskIndex: taskIdx, done: !task.done });
-            await loadTasks();
-        }
+        const state = JSON.parse(json);
+        DATA.techTasks = state.techTasks || [];
+        savePersonalData();
+        renderTechDashboard();
+        alert('✅ Tech dashboard restored from backup!');
     } catch (e) {
-        console.error('Failed to toggle task:', e);
+        alert('❌ Invalid backup format: ' + e.message);
     }
 };
 
-// Initialize
-async function init() {
-    try {
-        // Initialize tasks in DB
-        await convex.mutation("tasks:initializeTasks", {});
-    } catch (e) {
-        console.warn('Tasks might already be initialized:', e);
+// ── Render Tech Lead Tab ──
+function renderTechLeadTab() {
+    // Render his priority items
+    renderPriorities('p-techlead-detail', DATA.team.techLead);
+
+    // Update his progress ring
+    const pct = calcPct(DATA.team.techLead);
+    const color = scoreColor(pct);
+    const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+
+    setTimeout(() => {
+        const ring = $('tl-ring-fill');
+        if (ring) {
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = color;
+        }
+    }, 100);
+
+    if ($('tl-ring-label')) {
+        $('tl-ring-label').textContent = pct + '%';
+        $('tl-ring-label').style.color = color;
+    }
+    if ($('tl-perf-title')) {
+        $('tl-perf-title').textContent = scoreLabel(pct);
+        $('tl-perf-title').style.color = color;
+    }
+    if ($('tl-perf-sub')) {
+        $('tl-perf-sub').textContent = `${DATA.team.techLead.filter(i => i.status === 'done').length} of ${DATA.team.techLead.length} tasks done`;
+    }
+    if ($('tl-week-label')) {
+        $('tl-week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
     }
 
-    loadPriorities();
-    loadTasks();
-
-    // Refresh every 2 seconds
-    setInterval(() => {
-        loadPriorities();
-        loadTasks();
-    }, 2000);
+    // Render AI Email System
+    renderAIEmailSystem();
 }
 
-init();
-</script>
+// ── Render AI Email System ──
+function renderAIEmailSystem() {
+    const phases = DATA.techTasks;
+    const allTasks = phases.flatMap(p => p.tasks);
+    const totalDone = allTasks.filter(t => t.done).length;
+    const totalTasks = allTasks.length;
+    const pct = totalTasks > 0 ? Math.round(totalDone / totalTasks * 100) : 0;
 
+    if ($('tech-pill')) {
+        $('tech-pill').textContent = `${pct}% — 6 phases`;
+    }
+
+    // Render phases
+    $('ai-phases-list').innerHTML = phases.map((phase, phaseIdx) => {
+        const phaseTasks = phase.tasks;
+        const phaseDone = phaseTasks.filter(t => t.done).length;
+        const phasePct = phaseTasks.length > 0 ? Math.round(phaseDone / phaseTasks.length * 100) : 0;
+        const phaseColor = scoreColor(phasePct);
+
+        return `
+            <div style="padding: 8px 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid var(--border);">
+                <button onclick="toggleAIPhase(${phaseIdx})" style="width: 100%; padding: 0; background: none; border: none; color: inherit; cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; font-family: inherit;">
+                    <span style="color: var(--text-1);">${phase.phase}</span>
+                    <span id="ai-phase-toggle-${phaseIdx}">▼</span>
+                </button>
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 10px; margin-top: 6px;">
+                    <div style="flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
+                        <div style="height: 100%; background: ${phaseColor}; width: ${phasePct}%; border-radius: 2px; transition: width 0.3s;"></div>
+                    </div>
+                    <span style="color: var(--text-2); font-weight: 600;">${phaseDone}/${phaseTasks.length}</span>
+                </div>
+                <div id="ai-phase-content-${phaseIdx}" style="display: none; flex-direction: column; gap: 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05);">
+                    ${phaseTasks.map((task, taskIdx) => `
+                        <div style="display: flex; align-items: flex-start; gap: 6px; padding: 6px; border-radius: 4px; background: ${task.done ? 'rgba(63,185,80,0.08)' : 'transparent'}; cursor: pointer; transition: background 0.2s;" onclick="toggleAITask(${phaseIdx}, ${taskIdx})">
+                            <input type="checkbox" ${task.done ? 'checked' : ''} style="width: 14px; height: 14px; margin-top: 2px; cursor: pointer; accent-color: var(--green);" onclick="event.stopPropagation(); toggleAITask(${phaseIdx}, ${taskIdx})">
+                            <span style="font-size: 10px; line-height: 1.4; flex: 1; ${task.done ? 'text-decoration: line-through; color: var(--text-2);' : 'color: var(--text-1);'}">${task.text}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+window.toggleAIPhase = function(phaseIdx) {
+    const content = $(`ai-phase-content-${phaseIdx}`);
+    const icon = $(`ai-phase-toggle-${phaseIdx}`);
+    const isHidden = content.style.display === 'none';
+    content.style.display = isHidden ? 'flex' : 'none';
+    icon.textContent = isHidden ? '▲' : '▼';
+};
+
+window.toggleAITask = function(phaseIdx, taskIdx) {
+    DATA.techTasks[phaseIdx].tasks[taskIdx].done = !DATA.techTasks[phaseIdx].tasks[taskIdx].done;
+    savePersonalData();
+    renderAIEmailSystem();
+};
+
+// ── Render Duffles Tab ──
+function renderDufflesTab() {
+    // Render her priority items
+    renderPriorities('p-duffles-detail', DATA.team.duffles);
+
+    // Update her progress ring
+    const pct = calcPct(DATA.team.duffles);
+    const color = scoreColor(pct);
+    const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+
+    setTimeout(() => {
+        const ring = $('gael-ring-fill');
+        if (ring) {
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = color;
+        }
+    }, 100);
+
+    if ($('gael-ring-label')) {
+        $('gael-ring-label').textContent = pct + '%';
+        $('gael-ring-label').style.color = color;
+    }
+    if ($('gael-perf-title')) {
+        $('gael-perf-title').textContent = scoreLabel(pct);
+        $('gael-perf-title').style.color = color;
+    }
+    if ($('gael-perf-sub')) {
+        $('gael-perf-sub').textContent = `${DATA.team.duffles.filter(i => i.status === 'done').length} of ${DATA.team.duffles.length} tasks done`;
+    }
+    if ($('gael-week-label')) {
+        $('gael-week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
+    }
+}
+
+// ── Toggle Priority Status ──
+window.togglePriorityStatus = function(containerId, itemIdx) {
+    // Determine which team member this is
+    let items = null;
+    let rerender = null;
+
+    if (containerId === 'p-techlead-detail') {
+        items = DATA.team.techLead;
+        rerender = renderTechLeadTab;
+    } else if (containerId === 'p-duffles-detail') {
+        items = DATA.team.duffles;
+        rerender = renderDufflesTab;
+    } else if (containerId === 'p-techlead') {
+        items = DATA.team.techLead;
+        rerender = () => {
+            renderPriorities('p-techlead', DATA.team.techLead);
+            setMemberBar('bar-tl', 'pct-tl', DATA.team.techLead);
+        };
+    } else if (containerId === 'p-duffles') {
+        items = DATA.team.duffles;
+        rerender = () => {
+            renderPriorities('p-duffles', DATA.team.duffles);
+            setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles);
+        };
+    }
+
+    if (items && rerender) {
+        // Toggle: done → todo, anything else → done
+        items[itemIdx].status = items[itemIdx].status === 'done' ? 'todo' : 'done';
+        savePersonalData();
+        rerender();
+    }
+};
+
+// ── Initial renders ──
+renderTechLeadTab();
+renderDufflesTab();
+renderAIEmailSystem();
+
+// ── Convex: live sync ──
+// When ANY device saves a change, every other screen reloads to show it.
+// The _rev guard prevents a device from reloading on its own change.
+convex.onUpdate("dashboard:get", {}, (val) => {
+    if (val && (val._rev || 0) !== _myRev) {
+        location.reload();
+    }
+});
+</script>
 </body>
 </html>
