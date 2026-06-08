@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nini's Command Center — Live</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:      #07090f;
+            --card:    #0d1117;
+            --border:  #1c2333;
+            --accent:  #58a6ff;
+            --green:   #3fb950;
+            --yellow:  #d29922;
+            --red:     #f85149;
+            --purple:  #a371f7;
+            --orange:  #e3863a;
+            --text-1:  #e6edf3;
+            --text-2:  #7d8590;
+            --text-3:  #30363d;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 14px 18px;
+            gap: 8px;
+        }
+
+        @keyframes pulse-red   { 0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,0)} 50%{box-shadow:0 0 14px 4px rgba(248,81,73,0.5)} }
+        @keyframes pulse-dot   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+        @keyframes glow-green  { 0%,100%{box-shadow:0 0 5px rgba(63,185,80,0.4)} 50%{box-shadow:0 0 14px rgba(63,185,80,0.9)} }
+        @keyframes glow-accent { 0%,100%{box-shadow:0 0 5px rgba(88,166,255,0.3)} 50%{box-shadow:0 0 16px rgba(88,166,255,0.7)} }
+        @keyframes slide-in    { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+
+        header { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { font-size: 22px; }
+        .logo-text h1 { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; }
+        .logo-text p { font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; font-weight: 700; margin-top: 2px; }
+        .header-right { text-align: right; }
+        #clock { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -1px; }
+        #date-display { font-size: 11px; color: var(--text-2); font-weight: 500; }
+
+        .divider { height: 1px; background: var(--border); flex-shrink: 0; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .card-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); }
+        .card-pill { font-size: 9px; padding: 2px 8px; border-radius: 20px; font-weight: 600; background: rgba(88,166,255,0.1); color: var(--accent); }
+
+        .main-grid { display: grid; grid-template-columns: 1fr 240px 200px; gap: 8px; flex: 1; min-height: 0; }
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr 250px; gap: 8px; flex-shrink: 0; height: 185px; }
+        .right-col { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+
+        .team-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+        .team-member-card { display: flex; flex-direction: column; gap: 6px; }
+        .member-header { display: flex; align-items: center; gap: 8px; padding-bottom: 7px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .avatar { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #fff; flex-shrink: 0; }
+        .av-tech { background: linear-gradient(135deg, #0ea5e9, #6366f1); }
+        .av-duffles { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .member-info { flex: 1; min-width: 0; }
+        .member-name { font-size: 13px; font-weight: 700; }
+        .member-role { font-size: 9px; color: var(--text-2); margin-top: 1px; }
+        .member-progress { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .mp-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .mp-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+        .mp-label { font-size: 9px; font-weight: 700; min-width: 26px; text-align: right; }
+
+        .priority-items { display: flex; flex-direction: column; gap: 4px; flex: 0 1 auto; overflow-y: auto; }
+        .priority-item { display: flex; align-items: center; gap: 7px; padding: 8px 9px; border-radius: 6px; background: rgba(255,255,255,0.02); border: 1px solid transparent; flex: 1; }
+        .priority-item:hover { background: rgba(88,166,255,0.04); border-color: rgba(88,166,255,0.1); }
+        .priority-item.s-done { opacity: 0.4; }
+        .priority-item.s-done .p-text { text-decoration: line-through; color: var(--text-2); }
+        .p-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+        .p-text { font-size: 11px; font-weight: 500; line-height: 1.3; flex: 1; }
+        .p-badge { font-size: 8px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; align-self: center; }
+
+        .ring-wrap { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+        .ring-wrap svg { transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+        .ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1.2s ease; }
+        .ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums; }
+
+        .tab-nav { display: flex; gap: 8px; flex-shrink: 0; padding: 0 0 8px 0; border-bottom: 1px solid var(--border); }
+        .tab-btn { padding: 6px 14px; border: none; background: transparent; color: var(--text-2); cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-btn:hover { color: var(--text-1); }
+        .tab-content { display: none !important; flex: 1; min-height: 0; flex-direction: column; gap: 8px; overflow: hidden; }
+        .tab-content.active { display: flex !important; }
+
+        .priority-button { width: 28px; height: 28px; border-radius: 4px; border: 1.5px solid var(--text-3); background: transparent; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: inherit; }
+        .priority-button.done { border-color: var(--green); background: var(--green); }
+
+        .loading { text-align: center; padding: 20px; color: var(--text-2); }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <div class="logo-text">
+            <h1>TEAM COMMAND CENTER</h1>
+            <p>Do the work · Win the day · Build the future</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <div id="clock">--:--:--</div>
+        <div id="date-display">Loading...</div>
+    </div>
+</header>
+
+<div class="divider"></div>
+
+<!-- TAB NAVIGATION -->
+<div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('team', this)">🧠 Team Command Center</button>
+    <button class="tab-btn" onclick="switchTab('techlead', this)">👨‍💼 Tech Lead</button>
+    <button class="tab-btn" onclick="switchTab('duffles', this)">👜 Duffles</button>
+    <button class="tab-btn" onclick="switchTab('reminders', this)">🔔 Team Reminders</button>
+</div>
+
+<!-- TEAM TAB -->
+<div id="team-tab" class="tab-content active">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🎯 Weekly Priorities</span>
+        </div>
+        <div class="team-columns">
+            <div class="team-member-card">
+                <div class="member-header">
+                    <div class="avatar av-tech">TL</div>
+                    <div class="member-info">
+                        <div class="member-name">Tech Lead</div>
+                        <div class="member-role">Ops · AI PM Build · $2,400/mo</div>
+                    </div>
+                </div>
+                <div class="member-progress">
+                    <div class="mp-bar-bg"><div class="mp-bar-fill" id="bar-tl"></div></div>
+                    <span class="mp-label" id="pct-tl">0%</span>
+                </div>
+                <div class="priority-items" id="p-techlead"></div>
+            </div>
+            <div class="team-member-card">
+                <div class="member-header">
+                    <div class="avatar av-duffles">G</div>
+                    <div class="member-info">
+                        <div class="member-name">Gael</div>
+                        <div class="member-role">CMO · Duffles · Part-time</div>
+                    </div>
+                </div>
+                <div class="member-progress">
+                    <div class="mp-bar-bg"><div class="mp-bar-fill" id="bar-dh"></div></div>
+                    <span class="mp-label" id="pct-dh">0%</span>
+                </div>
+                <div class="priority-items" id="p-duffles"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TECH LEAD TAB -->
+<div id="techlead-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">👨‍💼 Tech Lead Dashboard</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+            <div class="ring-wrap">
+                <svg width="52" height="52" viewBox="0 0 52 52">
+                    <circle class="ring-bg" cx="26" cy="26" r="21"/>
+                    <circle class="ring-fill" cx="26" cy="26" r="21" id="tl-ring" stroke="var(--green)" stroke-dasharray="131.9" stroke-dashoffset="131.9"/>
+                </svg>
+                <div class="ring-label" id="tl-ring-label">0%</div>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:13px; font-weight:700; color:var(--text-1);" id="tl-label">—</div>
+                <div style="font-size:10px; color:var(--text-2); margin-top:2px;" id="tl-sub">—</div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div class="priority-items" id="p-techlead-detail"></div>
+    </div>
+
+    <div class="card" style="flex:1; min-height:0; overflow-y:auto;">
+        <div class="card-header">
+            <span class="card-title">🤖 AI Email System</span>
+            <span class="card-pill" id="tech-pill">0% — 6 phases</span>
+        </div>
+        <div id="ai-phases" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+</div>
+
+<!-- DUFFLES TAB -->
+<div id="duffles-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">👜 Duffles — Gael</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+            <div class="ring-wrap">
+                <svg width="52" height="52" viewBox="0 0 52 52">
+                    <circle class="ring-bg" cx="26" cy="26" r="21"/>
+                    <circle class="ring-fill" cx="26" cy="26" r="21" id="dh-ring" stroke="var(--green)" stroke-dasharray="131.9" stroke-dashoffset="131.9"/>
+                </svg>
+                <div class="ring-label" id="dh-ring-label">0%</div>
+            </div>
+            <div style="flex:1;">
+                <div style="font-size:13px; font-weight:700; color:var(--text-1);" id="dh-label">—</div>
+                <div style="font-size:10px; color:var(--text-2); margin-top:2px;" id="dh-sub">—</div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div class="priority-items" id="p-duffles-detail"></div>
+    </div>
+</div>
+
+<!-- TEAM REMINDERS TAB -->
+<div id="reminders-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🏆 Weekly Wins</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.4;">
+            <div>✅ Built Tier One PM Dashboard system</div>
+            <div>✅ All bank accounts routing real estate income</div>
+            <div>✅ Tech Lead follow-up completed</div>
+            <div>✅ CMO brand marketing follow-up completed</div>
+            <div>✅ Team meeting Friday — progress review + gap identification</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🔴 Active Blockers</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.4;">
+            <div>▲ DRE exam date confirmation</div>
+            <div>▲ Gusto payroll setup</div>
+            <div>▲ QuickBooks setup</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">📋 Meeting Notes & Action Items</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; line-height:1.4;">
+            <div style="padding:8px; background:rgba(88,166,255,0.05); border-radius:6px; border:1px solid rgba(88,166,255,0.1);">
+                <div style="font-weight:700; margin-bottom:4px;">Friday Team Meeting</div>
+                <div>- Reviewed progress on PM company setup</div>
+                <div>- Identified gaps in workflow automation</div>
+                <div>- Next: Attorney meeting on 5/29</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">⚡ Next Week's Focus</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; font-size:11px; line-height:1.4;">
+            <div>→ Broker license — await DRE exam date</div>
+            <div>→ AI PM Dashboard — continue build</div>
+            <div>→ Duffles — video shoot + marketing push</div>
+            <div>→ Acquisitions — restart June 15</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/convex@latest/browser/index.js"></script>
+<script>
+const CONVEX_URL = "https://adventurous-squid-490.convex.cloud";
+const { ConvexClient } = window;
+const convex = new ConvexClient(CONVEX_URL);
+
+const CIRCUMFERENCE = 2 * Math.PI * 21;
+const $ = id => document.getElementById(id);
+
+function scoreColor(pct) {
+    if (pct === 0) return 'var(--accent)';
+    if (pct >= 70) return 'var(--green)';
+    if (pct >= 40) return 'var(--yellow)';
+    return 'var(--red)';
+}
+
+function scoreLabel(pct) {
+    if (pct === 0) return '🚀 Week Starting';
+    if (pct >= 80) return '🔥 Crushing It';
+    if (pct >= 60) return '✅ On Track';
+    if (pct >= 40) return '⚡ Needs Push';
+    return '🔴 Falling Behind';
+}
+
+// Clock
+function updateClock() {
+    const n = new Date(), pad = v => String(v).padStart(2,'0');
+    $('clock').textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+    const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MONS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    $('date-display').textContent = `${DAYS[n.getDay()]}, ${MONS[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Tab switching
+window.switchTab = function(tabName, btnEl) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const tabEl = $(tabName + '-tab');
+    if (tabEl) tabEl.classList.add('active');
+    if (btnEl) btnEl.classList.add('active');
+};
+
+// Load priorities from Convex
+async function loadPriorities() {
+    try {
+        const techLeadPriorities = await convex.query("priorities:getPriorities", { team: "techLead" });
+        const dufflesPriorities = await convex.query("priorities:getPriorities", { team: "duffles" });
+
+        renderPriorities('p-techlead', techLeadPriorities);
+        renderPriorities('p-duffles', dufflesPriorities);
+        renderPriorities('p-techlead-detail', techLeadPriorities);
+        renderPriorities('p-duffles-detail', dufflesPriorities);
+
+        updateProgress('techLead', techLeadPriorities);
+        updateProgress('duffles', dufflesPriorities);
+    } catch (e) {
+        console.error('Failed to load priorities:', e);
+    }
+}
+
+function renderPriorities(id, items) {
+    $(id).innerHTML = (items || []).map((p, idx) => {
+        const isDone = p.status === 'done';
+        return `<div class="priority-item s-${p.status}">
+            <div class="p-dot"></div>
+            <span class="p-text">${p.text}</span>
+            <button class="priority-button ${isDone ? 'done' : ''}" onclick="togglePriority('${p.team}', '${p.text}', '${p.status}')" style="flex-shrink:0;">
+                ${isDone ? '✓' : ''}
+            </button>
+        </div>`;
+    }).join('');
+}
+
+window.togglePriority = async function(team, text, currentStatus) {
+    const newStatus = currentStatus === 'done' ? 'todo' : 'done';
+    try {
+        await convex.mutation("priorities:updatePriority", { team, text, status: newStatus });
+        await loadPriorities();
+    } catch (e) {
+        console.error('Failed to update priority:', e);
+    }
+};
+
+function updateProgress(team, items) {
+    const done = items.filter(i => i.status === 'done').length;
+    const total = items.length;
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    const color = scoreColor(pct);
+    const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+
+    if (team === 'techLead') {
+        const ring = $('tl-ring');
+        if (ring) {
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = color;
+        }
+        $('tl-ring-label').textContent = pct + '%';
+        $('tl-ring-label').style.color = color;
+        $('tl-label').textContent = scoreLabel(pct);
+        $('tl-label').style.color = color;
+        $('tl-sub').textContent = `${done} of ${total} tasks done`;
+        $('bar-tl').style.width = pct + '%';
+        $('bar-tl').style.background = color;
+        $('pct-tl').textContent = pct + '%';
+        $('pct-tl').style.color = color;
+    } else if (team === 'duffles') {
+        const ring = $('dh-ring');
+        if (ring) {
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = color;
+        }
+        $('dh-ring-label').textContent = pct + '%';
+        $('dh-ring-label').style.color = color;
+        $('dh-label').textContent = scoreLabel(pct);
+        $('dh-label').style.color = color;
+        $('dh-sub').textContent = `${done} of ${total} tasks done`;
+        $('bar-dh').style.width = pct + '%';
+        $('bar-dh').style.background = color;
+        $('pct-dh').textContent = pct + '%';
+        $('pct-dh').style.color = color;
+    }
+}
+
+// Load AI tasks
+async function loadTasks() {
+    try {
+        const tasks = await convex.query("tasks:getTasks", {});
+
+        // Group by phase
+        const phases = {};
+        tasks.forEach(t => {
+            if (!phases[t.phase]) phases[t.phase] = [];
+            phases[t.phase].push(t);
+        });
+
+        renderTasks(phases);
+    } catch (e) {
+        console.error('Failed to load tasks:', e);
+    }
+}
+
+function renderTasks(phases) {
+    const allTasks = Object.values(phases).flat();
+    const done = allTasks.filter(t => t.done).length;
+    const total = allTasks.length;
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+
+    $('tech-pill').textContent = `${pct}% — 6 phases`;
+
+    const phaseNames = [
+        "Phase 1: Email Infrastructure",
+        "Phase 2: Nextiva Integration",
+        "Phase 3: Data Aggregation",
+        "Phase 4: Personal Dashboard Reflection",
+        "Phase 5: Automation Workflows",
+        "Phase 6: Backup & Sync"
+    ];
+
+    $('ai-phases').innerHTML = phaseNames.map((name, idx) => {
+        const phaseTasks = phases[idx] || [];
+        const phaseDone = phaseTasks.filter(t => t.done).length;
+        const phasePct = phaseTasks.length > 0 ? Math.round(phaseDone / phaseTasks.length * 100) : 0;
+        const color = scoreColor(phasePct);
+
+        return `<div style="padding:8px 10px; background:rgba(255,255,255,0.02); border-radius:6px; border:1px solid var(--border);">
+            <button onclick="togglePhaseExpand(${idx})" style="width:100%; padding:0; background:none; border:none; color:inherit; cursor:pointer; text-align:left; display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:700; font-family:inherit;">
+                <span style="color:var(--text-1);">${name}</span>
+                <span id="phase-icon-${idx}">▼</span>
+            </button>
+            <div style="display:flex; align-items:center; gap:6px; font-size:10px; margin-top:6px;">
+                <div style="flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+                    <div style="height:100%; background:${color}; width:${phasePct}%; border-radius:2px;"></div>
+                </div>
+                <span style="color:var(--text-2);">${phaseDone}/${phaseTasks.length}</span>
+            </div>
+            <div id="phase-${idx}" style="display:none; flex-direction:column; gap:4px; margin-top:6px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05);">
+                ${phaseTasks.map(t => `
+                    <div style="display:flex; align-items:center; gap:6px; padding:6px; border-radius:4px; background:${t.done ? 'rgba(63,185,80,0.08)' : 'transparent'}; cursor:pointer;" onclick="toggleTask(${t.phase}, ${t.taskIndex})">
+                        <input type="checkbox" ${t.done ? 'checked' : ''} style="width:14px; height:14px; cursor:pointer; accent-color:var(--green);" onchange="event.stopPropagation(); toggleTask(${t.phase}, ${t.taskIndex})">
+                        <span style="font-size:10px; flex:1; ${t.done ? 'text-decoration:line-through; color:var(--text-2);' : 'color:var(--text-1);'}">${t.text}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+window.togglePhaseExpand = function(idx) {
+    const phase = $(`phase-${idx}`);
+    const icon = $(`phase-icon-${idx}`);
+    const isHidden = phase.style.display === 'none';
+    phase.style.display = isHidden ? 'flex' : 'none';
+    icon.textContent = isHidden ? '▲' : '▼';
+};
+
+window.toggleTask = async function(phase, taskIdx) {
+    try {
+        const tasks = await convex.query("tasks:getTasks", {});
+        const task = tasks.find(t => t.phase === phase && t.taskIndex === taskIdx);
+        if (task) {
+            await convex.mutation("tasks:updateTask", { phase, taskIndex: taskIdx, done: !task.done });
+            await loadTasks();
+        }
+    } catch (e) {
+        console.error('Failed to toggle task:', e);
+    }
+};
+
+// Initialize
+async function init() {
+    try {
+        // Initialize tasks in DB
+        await convex.mutation("tasks:initializeTasks", {});
+    } catch (e) {
+        console.warn('Tasks might already be initialized:', e);
+    }
+
+    loadPriorities();
+    loadTasks();
+
+    // Refresh every 2 seconds
+    setInterval(() => {
+        loadPriorities();
+        loadTasks();
+    }, 2000);
+}
+
+init();
+</script>
+
+</body>
+</html>
