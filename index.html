@@ -279,10 +279,9 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/convex@latest/browser/index.js"></script>
-<script>
+<script type="module">
+import { ConvexClient } from "https://esm.sh/convex@latest/browser";
 const CONVEX_URL = "https://adventurous-squid-490.convex.cloud";
-const { ConvexClient } = window;
 const convex = new ConvexClient(CONVEX_URL);
 
 const CIRCUMFERENCE = 2 * Math.PI * 21;
@@ -513,5 +512,3 @@ init();
 
 </body>
 </html>
-
-<!-- auto-deploy test: 2026-06-07 21:06 -->
