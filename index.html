@@ -264,6 +264,23 @@
         .badge-upcoming { background: rgba(163,113,247,0.15); color: var(--purple); }
         .badge-done     { background: rgba(63,185,80,0.15);   color: var(--green);  }
 
+        /* ─── ACCOUNTABILITY LAYER ─── */
+        .p-meta { font-size: 8px; color: var(--text-2); align-self: center; flex-shrink: 0; white-space: nowrap; }
+        .p-stalled {
+            font-size: 8px; font-weight: 800; text-transform: uppercase;
+            padding: 1px 5px; border-radius: 3px; flex-shrink: 0; align-self: center;
+            background: rgba(248,81,73,0.18); color: var(--red); white-space: nowrap;
+            animation: pulse-stale 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse-stale { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .priority-item.is-stalled,
+        .todo-item.is-stalled { border-color: rgba(248,81,73,0.5) !important; background: rgba(248,81,73,0.06) !important; }
+        .kill-badge {
+            font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 3px;
+            background: rgba(163,113,247,0.14); color: var(--purple); flex-shrink: 0;
+            white-space: nowrap; align-self: center;
+        }
+
         /* ─── PROJECT HEALTH ─── */
         .project-list { display: flex; flex-direction: column; gap: 5px; flex: 1; overflow: hidden; }
         .project-item {
@@ -1167,6 +1184,23 @@ $('today-section').innerHTML = `
         <span class="today-task">${DATA.today.duffles}</span>
     </div>`;
 
+// ── Accountability helpers ──
+const STALE_HOURS = 48; // not-done + untouched this long → flagged STALLED
+function timeAgo(ts) {
+    if (!ts) return '';
+    const mins = Math.floor((Date.now() - ts) / 60000);
+    if (mins < 2) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
+}
+function isStalled(item) {
+    if (item.status === 'done' || item.done) return false;
+    if (!item.lastMoved) return false;
+    return (Date.now() - item.lastMoved) > STALE_HOURS * 3600000;
+}
+
 // ── Priorities ──
 const BADGE = { active:'badge-active', waiting:'badge-waiting', upcoming:'badge-upcoming', done:'badge-done' };
 const BADGE_TEXT = { active:'Active', waiting:'Waiting', upcoming:'Soon', done:'Done' };
@@ -1175,9 +1209,14 @@ function renderPriorities(id, items) {
         const badge = BADGE[p.status]
             ? `<span class="p-badge ${BADGE[p.status]}">${BADGE_TEXT[p.status]}</span>` : '';
         const isDone = p.status === 'done';
-        return `<div class="priority-item s-${p.status}" style="position: relative;">
+        const stalled = isStalled(p);
+        const meta = isDone ? ''
+            : stalled ? `<span class="p-stalled" title="No movement in ${STALE_HOURS}h+">⚠ Stalled · ${timeAgo(p.lastMoved)}</span>`
+            : (p.lastMoved ? `<span class="p-meta">${timeAgo(p.lastMoved)}</span>` : '');
+        return `<div class="priority-item s-${p.status}${stalled ? ' is-stalled' : ''}" style="position: relative;">
             <div class="p-dot"></div>
             <span class="p-text">${p.text}</span>
+            ${meta}
             <button onclick="togglePriorityStatus('${id}', ${idx})" style="flex-shrink: 0; width: 28px; height: 28px; border-radius: 4px; border: 1.5px solid ${isDone ? 'var(--green)' : 'var(--text-3)'}; background: ${isDone ? 'var(--green)' : 'transparent'}; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: inherit;">
                 ${isDone ? '✓' : ''}
             </button>
@@ -1465,17 +1504,24 @@ function renderPersonalTodos() {
     const pct = total > 0 ? Math.round(done / total * 100) : 0;
 
     // Render to-do list
-    $('todo-list-main').innerHTML = todos.map((t, i) => `
-        <div class="todo-item ${t.done ? 'done' : ''}" id="todo-${i}">
+    $('todo-list-main').innerHTML = todos.map((t, i) => {
+        const stalled = isStalled(t);
+        const kill = t.killedBy ? `<span class="kill-badge" title="This manual task goes away once we ship ${t.killedBy}">⚙ ${t.killedBy}</span>` : '';
+        const meta = (!t.done && stalled) ? `<span class="p-stalled">⚠ ${timeAgo(t.lastMoved)}</span>`
+            : (!t.done && t.lastMoved ? `<span class="p-meta">${timeAgo(t.lastMoved)}</span>` : '');
+        return `
+        <div class="todo-item ${t.done ? 'done' : ''}${stalled ? ' is-stalled' : ''}" id="todo-${i}">
             <div class="todo-check" onclick="toggleTodo(${i})">
                 ${t.done ? '✓' : ''}
             </div>
             <div class="todo-text">${t.text}</div>
+            ${kill}
+            ${meta}
             <button onclick="deleteTodo(${i})" style="flex-shrink:0; width:20px; height:20px; border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:12px; padding:0; display:flex; align-items:center; justify-content:center; transition:color 0.2s;" title="Delete">
                 ✕
             </button>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 
     // Update progress ring
     const ringColor = scoreColor(pct);
@@ -1537,6 +1583,7 @@ function renderPersonalTodos() {
 
 window.toggleTodo = function(i) {
     DATA.personalTodos[i].done = !DATA.personalTodos[i].done;
+    DATA.personalTodos[i].lastMoved = Date.now(); // accountability: stamp movement
     savePersonalData();
     renderPersonalTodos();
 };
@@ -1967,6 +2014,7 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
     if (items && rerender) {
         // Toggle: done → todo, anything else → done
         items[itemIdx].status = items[itemIdx].status === 'done' ? 'todo' : 'done';
+        items[itemIdx].lastMoved = Date.now(); // accountability: stamp every movement
         savePersonalData();
         rerender();
     }
@@ -1976,6 +2024,15 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
 renderTechLeadTab();
 renderDufflesTab();
 renderAIEmailSystem();
+
+// ── Accountability: re-render every 5 min so STALLED flags appear on their own ──
+setInterval(() => {
+    renderPriorities('p-techlead', DATA.team.techLead);
+    renderPriorities('p-duffles', DATA.team.duffles);
+    renderPriorities('p-techlead-detail', DATA.team.techLead);
+    renderPriorities('p-duffles-detail', DATA.team.duffles);
+    renderPersonalTodos();
+}, 300000);
 
 // ── Convex: live sync ──
 // When ANY device saves a change, every other screen reloads to show it.
