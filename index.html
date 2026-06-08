@@ -1128,24 +1128,31 @@ $('win-text').textContent = DATA.winCondition;
 // ── Motivational Anchor ──
 $('motivational').textContent = `"${DATA.motivationalLine}"`;
 
-// ── Week Label ──
+// ── Week Label + Week Progress Bar ──
+// Auto-recomputes every minute so a TV left on for days never goes stale —
+// the day/week roll over on their own at midnight, no refresh needed.
 const _n = new Date();
 const _mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-$('week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
 
-// ── Week Progress Bar ──
-(function() {
-    const day = _n.getDay(); // 0=Sun, 1=Mon ... 5=Fri, 6=Sat
+function updateWeekProgress() {
+    const now = new Date();
+    const weekLabel = `Week of ${_mo[now.getMonth()]} ${now.getDate()}`;
+    if ($('week-label')) $('week-label').textContent = weekLabel;
+    if ($('tl-week-label')) $('tl-week-label').textContent = weekLabel;
+    if ($('gael-week-label')) $('gael-week-label').textContent = weekLabel;
+
+    const day = now.getDay(); // 0=Sun, 1=Mon ... 5=Fri, 6=Sat
     const workDay = (day === 0 || day === 6) ? 5 : day; // weekend = show as Friday
     const labels = ['M','T','W','T','F'];
-    const days = ['wp-days'];
-    $('wp-label').textContent = `Day ${workDay} of 5`;
-    $('wp-days').innerHTML = labels.map((l, i) => {
+    if ($('wp-label')) $('wp-label').textContent = `Day ${workDay} of 5`;
+    if ($('wp-days')) $('wp-days').innerHTML = labels.map((l, i) => {
         const d = i + 1;
         let cls = d < workDay ? 'past' : d === workDay ? 'today' : 'future';
         return `<div class="wp-day ${cls}" title="${['Mon','Tue','Wed','Thu','Fri'][i]}"></div>`;
     }).join('');
-})();
+}
+updateWeekProgress();
+setInterval(updateWeekProgress, 60000); // re-check every minute
 
 // ── Today's Focus ──
 $('today-section').innerHTML = `
