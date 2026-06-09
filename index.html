@@ -263,6 +263,18 @@
         .badge-waiting  { background: rgba(210,153,34,0.15);  color: var(--yellow); }
         .badge-upcoming { background: rgba(163,113,247,0.15); color: var(--purple); }
         .badge-done     { background: rgba(63,185,80,0.15);   color: var(--green);  }
+        .due-pill {
+            font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 3px;
+            flex-shrink: 0; align-self: center; white-space: nowrap;
+            background: rgba(88,166,255,0.12); color: var(--accent);
+        }
+        .due-pill.urgent { background: rgba(248,81,73,0.18); color: var(--red); }
+        .p-urgent {
+            font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px;
+            padding: 1px 5px; border-radius: 3px; flex-shrink: 0; align-self: center;
+            background: var(--red); color: #fff; white-space: nowrap;
+        }
+        .priority-item.urgent { border-color: rgba(248,81,73,0.45); background: rgba(248,81,73,0.07); }
 
         /* ─── ACCOUNTABILITY LAYER ─── */
         .p-meta { font-size: 8px; color: var(--text-2); align-self: center; flex-shrink: 0; white-space: nowrap; }
@@ -1251,9 +1263,13 @@ function renderPriorities(id, items) {
         const meta = isDone ? ''
             : stalled ? `<span class="p-stalled" title="No movement in ${STALE_HOURS}h+">⚠ Stalled · ${timeAgo(p.lastMoved)}</span>`
             : (p.lastMoved ? `<span class="p-meta">${timeAgo(p.lastMoved)}</span>` : '');
-        return `<div class="priority-item s-${p.status}${stalled ? ' is-stalled' : ''}" style="position: relative;">
+        const duePill = p.due ? `<span class="due-pill${p.urgent ? ' urgent' : ''}">📅 ${p.due}</span>` : '';
+        const urgentBadge = (p.urgent && !isDone) ? `<span class="p-urgent">Urgent</span>` : '';
+        return `<div class="priority-item s-${p.status}${stalled ? ' is-stalled' : ''}${(p.urgent && !isDone) ? ' urgent' : ''}" style="position: relative;">
             <div class="p-dot"></div>
             <span class="p-text">${p.text}</span>
+            ${duePill}
+            ${urgentBadge}
             ${meta}
             <button onclick="togglePriorityStatus('${id}', ${idx})" style="flex-shrink: 0; width: 28px; height: 28px; border-radius: 4px; border: 1.5px solid ${isDone ? 'var(--green)' : 'var(--text-3)'}; background: ${isDone ? 'var(--green)' : 'transparent'}; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: inherit;">
                 ${isDone ? '✓' : ''}
