@@ -373,6 +373,25 @@
             background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.25);
             padding: 1px 5px; border-radius: 10px; font-weight: 700;
         }
+        .blocker-check {
+            width: 16px; height: 16px; border-radius: 4px; border: 2px solid var(--red);
+            flex-shrink: 0; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 9px; color: #fff; transition: all 0.2s;
+        }
+        .blocker-check:hover { border-color: var(--accent); }
+        .blocker-check.checked { background: var(--green); border-color: var(--green); }
+        .blocker-item.urgent { border-color: rgba(248,81,73,0.6); background: rgba(248,81,73,0.12); }
+        .blocker-urgent {
+            font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            color: #fff; background: var(--red); padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
+        }
+        .blocker-item.done {
+            opacity: 0.6; background: rgba(63,185,80,0.05);
+            border-color: rgba(63,185,80,0.2); animation: none;
+        }
+        .blocker-item.done .blocker-text { text-decoration: line-through; color: var(--text-2); }
+        .blocker-item.done .blocker-owner { color: var(--green); background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.25); }
+        .blocker-empty { font-size: 11px; color: var(--text-2); padding: 6px 8px; opacity: 0.7; }
         .red-label {
             font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
             color: var(--red); background: rgba(248,81,73,0.12);
@@ -647,6 +666,14 @@
             <span class="red-label">NEEDS ACTION</span>
         </div>
         <div class="blockers-list" id="blockers-list"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">✅ Completed This Week</span>
+            <span class="card-pill" id="completed-count">0 done</span>
+        </div>
+        <div class="blockers-list" id="completed-list"></div>
     </div>
 
     <div class="card">
@@ -1284,13 +1311,8 @@ $('deadline-list').innerHTML = DATA.deadlines.map(d => `
 $('wins-list').innerHTML = DATA.wins.map(w => `
     <div class="win-item"><span>✅</span><span>${w}</span></div>`).join('');
 
-// ── Blockers ──
-$('blockers-list').innerHTML = DATA.blockers.map(b => `
-    <div class="blocker-item">
-        <span class="blocker-icon">▲</span>
-        <span class="blocker-text">${b.text}</span>
-        <span class="blocker-owner">${b.owner}</span>
-    </div>`).join('');
+// ── Blockers + Completed This Week ──
+renderBlockers();
 
 // ── Team Performance Ring ──
 const allItems   = [...DATA.team.techLead, ...DATA.team.duffles];
@@ -1592,6 +1614,40 @@ window.deleteTodo = function(i) {
     DATA.personalTodos.splice(i, 1);
     savePersonalData();
     renderPersonalTodos();
+};
+
+// ── Blockers: render active + completed, with clickable checkboxes ──
+function renderBlockers() {
+    const active = [], done = [];
+    DATA.blockers.forEach((b, i) => (b.done ? done : active).push({ b, i }));
+    // Urgent active blockers float to the top.
+    active.sort((a, c) => (c.b.urgent === true) - (a.b.urgent === true));
+
+    $('blockers-list').innerHTML = active.map(({ b, i }) => `
+        <div class="blocker-item${b.urgent ? ' urgent' : ''}">
+            <div class="blocker-check" onclick="toggleBlocker(${i})" title="Mark done"></div>
+            <span class="blocker-text">${b.text}</span>
+            ${b.urgent ? '<span class="blocker-urgent">Urgent</span>' : ''}
+            <span class="blocker-owner">${b.owner}</span>
+        </div>`).join('') || '<div class="blocker-empty">No active blockers 🎉</div>';
+
+    $('completed-list').innerHTML = done.map(({ b, i }) => `
+        <div class="blocker-item done">
+            <div class="blocker-check checked" onclick="toggleBlocker(${i})" title="Mark not done">✓</div>
+            <span class="blocker-text">${b.text}</span>
+            <span class="blocker-owner">${b.owner}</span>
+        </div>`).join('') || '<div class="blocker-empty">Nothing completed yet this week.</div>';
+
+    if ($('completed-count')) $('completed-count').textContent = `${done.length} done`;
+}
+
+// Toggle a blocker done/active — persists to Convex (bumps _rev) and re-renders,
+// so a checked blocker moves into "Completed This Week".
+window.toggleBlocker = function(i) {
+    DATA.blockers[i].done = !DATA.blockers[i].done;
+    DATA.blockers[i].lastMoved = Date.now();
+    savePersonalData();
+    renderBlockers();
 };
 
 window.addNewTodo = function() {
