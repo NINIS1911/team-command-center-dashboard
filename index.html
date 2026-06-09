@@ -35,6 +35,25 @@
             padding: 14px 18px;
             gap: 8px;
         }
+        /* ─── TOP ALERT BANNER ─── */
+        .top-banner {
+            margin: -14px -18px 0;            /* full-bleed over body padding (top + sides) */
+            background: linear-gradient(90deg, #8f1c1d, var(--red), #8f1c1d);
+            color: #fff;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 13px 16px;
+            border-bottom: 2px solid rgba(255,255,255,0.35);
+            box-shadow: 0 3px 16px rgba(248,81,73,0.55);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            z-index: 200;
+            animation: banner-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes banner-pulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.28); } }
 
         /* ─── ANIMATIONS ─── */
         @keyframes pulse-red   { 0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,0)} 50%{box-shadow:0 0 14px 4px rgba(248,81,73,0.5)} }
@@ -549,6 +568,9 @@
     </style>
 </head>
 <body>
+
+<!-- ══════════ TOP ALERT BANNER (data-driven: DATA.banner) ══════════ -->
+<div id="top-banner" class="top-banner" style="display:none;"></div>
 
 <!-- ══════════ HEADER ══════════ -->
 <header>
@@ -1344,6 +1366,9 @@ renderBlockers();
 // ── AppFolio Setup checklist (Tech Lead tab) ──
 renderAppfolioSetup();
 
+// ── Top alert banner ──
+renderTopBanner();
+
 // ── Team Performance Ring ──
 const allItems   = [...DATA.team.techLead, ...DATA.team.duffles];
 const totalDone  = allItems.filter(i => i.status === 'done').length;
@@ -1700,6 +1725,15 @@ window.toggleAppfolioPhase = function(i) {
     savePersonalData();
     renderAppfolioSetup();
 };
+
+// ── Top alert banner: data-driven (DATA.banner = {active, text}) ──
+function renderTopBanner() {
+    const el = $('top-banner');
+    if (!el) return;
+    const b = DATA.banner;
+    if (b && b.active && b.text) { el.textContent = b.text; el.style.display = 'block'; }
+    else { el.style.display = 'none'; }
+}
 
 window.addNewTodo = function() {
     const input = $('new-todo-input');
