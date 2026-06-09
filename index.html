@@ -1366,8 +1366,9 @@ renderBlockers();
 // ── AppFolio Setup checklist (Tech Lead tab) ──
 renderAppfolioSetup();
 
-// ── Top alert banner ──
+// ── Top alert banner (live Friday countdown, refresh each minute) ──
 renderTopBanner();
+setInterval(renderTopBanner, 60000);
 
 // ── Team Performance Ring ──
 const allItems   = [...DATA.team.techLead, ...DATA.team.duffles];
@@ -1726,13 +1727,33 @@ window.toggleAppfolioPhase = function(i) {
     renderAppfolioSetup();
 };
 
-// ── Top alert banner: data-driven (DATA.banner = {active, text}) ──
+// ── Top alert banner: data-driven (DATA.banner = {active, text, deadline}) ──
+function fridayCountdown(deadlineStr) {
+    if (!deadlineStr) return '';
+    const target = new Date(deadlineStr).getTime();
+    if (isNaN(target)) return '';
+    const diff = target - Date.now();
+    if (diff <= 0) return '⏳ HAPPENING NOW';
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const parts = [];
+    if (d) parts.push(d + 'd');
+    parts.push(h + 'h');
+    if (!d) parts.push(m + 'm');           // show minutes only inside the last day
+    return `⏳ ${parts.join(' ')} to go`;
+}
 function renderTopBanner() {
     const el = $('top-banner');
     if (!el) return;
     const b = DATA.banner;
-    if (b && b.active && b.text) { el.textContent = b.text; el.style.display = 'block'; }
-    else { el.style.display = 'none'; }
+    if (b && b.active && b.text) {
+        const cd = fridayCountdown(b.deadline);
+        el.textContent = cd ? `${b.text}  ·  ${cd}` : b.text;
+        el.style.display = 'block';
+    } else {
+        el.style.display = 'none';
+    }
 }
 
 window.addNewTodo = function() {
