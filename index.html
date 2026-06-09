@@ -155,10 +155,10 @@
         /* ─── BOTTOM GRID ─── */
         .bottom-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 250px;
+            grid-template-columns: 1fr 1fr 1fr 250px;
             gap: 8px;
             flex-shrink: 0;
-            height: 185px;
+            height: 260px;
         }
 
         /* ─── CARD ─── */
@@ -392,6 +392,9 @@
         .blocker-item.done .blocker-text { text-decoration: line-through; color: var(--text-2); }
         .blocker-item.done .blocker-owner { color: var(--green); background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.25); }
         .blocker-empty { font-size: 11px; color: var(--text-2); padding: 6px 8px; opacity: 0.7; }
+        /* Active + completed blocker lists: taller, scroll past ~5 items, roomier rows */
+        #blockers-list, #completed-list { overflow-y: auto; overflow-x: hidden; }
+        #blockers-list .blocker-item, #completed-list .blocker-item { padding: 7px 8px; }
         .red-label {
             font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
             color: var(--red); background: rgba(248,81,73,0.12);
