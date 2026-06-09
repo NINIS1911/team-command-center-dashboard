@@ -774,6 +774,14 @@
         </div>
         <div id="ai-phases-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
     </div>
+
+    <div class="card" style="flex-shrink: 0;">
+        <div class="card-header">
+            <span class="card-title">🏢 AppFolio Setup</span>
+            <span class="card-pill" id="appfolio-pill">0% — 0/10 phases</span>
+        </div>
+        <div class="todo-list" id="appfolio-list" style="overflow-y: auto;"></div>
+    </div>
 </div> <!-- END TECH LEAD TAB -->
 
 <!-- ══════════ DUFFLES TAB ══════════ -->
@@ -1317,6 +1325,9 @@ $('wins-list').innerHTML = DATA.wins.map(w => `
 // ── Blockers + Completed This Week ──
 renderBlockers();
 
+// ── AppFolio Setup checklist (Tech Lead tab) ──
+renderAppfolioSetup();
+
 // ── Team Performance Ring ──
 const allItems   = [...DATA.team.techLead, ...DATA.team.duffles];
 const totalDone  = allItems.filter(i => i.status === 'done').length;
@@ -1651,6 +1662,27 @@ window.toggleBlocker = function(i) {
     DATA.blockers[i].lastMoved = Date.now();
     savePersonalData();
     renderBlockers();
+};
+
+// ── AppFolio Setup: 10-phase checklist, one checkbox per phase ──
+function renderAppfolioSetup() {
+    const items = DATA.appfolioSetup || [];
+    const el = $('appfolio-list');
+    if (!el) return;
+    const doneN = items.filter(p => p.done).length;
+    const pct = items.length ? Math.round(doneN / items.length * 100) : 0;
+    if ($('appfolio-pill')) $('appfolio-pill').textContent = `${pct}% — ${doneN}/${items.length} phases`;
+    el.innerHTML = items.map((p, i) => `
+        <div class="todo-item ${p.done ? 'done' : ''}">
+            <div class="todo-check" onclick="toggleAppfolioPhase(${i})">${p.done ? '✓' : ''}</div>
+            <div class="todo-text"><strong style="color:var(--accent);">Phase ${p.phase}</strong> — ${p.text}</div>
+        </div>`).join('') || '<div class="blocker-empty">No AppFolio setup phases defined.</div>';
+}
+
+window.toggleAppfolioPhase = function(i) {
+    DATA.appfolioSetup[i].done = !DATA.appfolioSetup[i].done;
+    savePersonalData();
+    renderAppfolioSetup();
 };
 
 window.addNewTodo = function() {
