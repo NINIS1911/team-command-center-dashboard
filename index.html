@@ -207,6 +207,12 @@
             font-weight: 600; background: rgba(88,166,255,0.1); color: var(--accent);
         }
         .card.alert { animation: flash-border 2.5s ease infinite; border-color: rgba(248,81,73,0.2); }
+        /* ─── COLLAPSIBLE SECTIONS ─── */
+        .collapsible { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.35s ease; }
+        .collapsible.collapsed { grid-template-rows: 0fr; }
+        .collapsible > * { overflow: hidden; min-height: 0; }
+        .collapse-caret { display: inline-block; font-size: 8px; margin-right: 3px; transition: transform 0.3s ease; }
+        .collapse-caret.collapsed { transform: rotate(-90deg); }
 
         /* ─── TODAY'S FOCUS ─── */
         .today-section {
@@ -797,25 +803,25 @@
         </div>
         <div class="divider"></div>
         <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2);">📋 Current Work</div>
-            <div class="priority-items" id="p-techlead-detail"></div>
+            <div onclick="toggleSection('cw-wrap','cw-caret')" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2); cursor: pointer; user-select: none;"><span class="collapse-caret" id="cw-caret">▼</span>📋 Current Work</div>
+            <div class="collapsible" id="cw-wrap"><div class="priority-items" id="p-techlead-detail"></div></div>
         </div>
-    </div>
-
-    <div class="card" style="flex: 1; min-height: 0; overflow-y: auto;">
-        <div class="card-header">
-            <span class="card-title">🏗️ PM System Build</span>
-            <span class="card-pill" id="tech-pill">0% — 6 phases</span>
-        </div>
-        <div id="ai-phases-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
     </div>
 
     <div class="card" style="flex-shrink: 0;">
-        <div class="card-header">
-            <span class="card-title">🏢 AppFolio Setup</span>
+        <div class="card-header" onclick="toggleSection('pm-wrap','pm-caret')" style="cursor: pointer; user-select: none;">
+            <span class="card-title"><span class="collapse-caret" id="pm-caret">▼</span>🏗️ PM System Build</span>
+            <span class="card-pill" id="tech-pill">0% — 6 phases</span>
+        </div>
+        <div class="collapsible" id="pm-wrap"><div id="ai-phases-list" style="display: flex; flex-direction: column; gap: 6px;"></div></div>
+    </div>
+
+    <div class="card" style="flex-shrink: 0;">
+        <div class="card-header" onclick="toggleSection('af-wrap','af-caret')" style="cursor: pointer; user-select: none;">
+            <span class="card-title"><span class="collapse-caret" id="af-caret">▼</span>🏢 AppFolio Setup</span>
             <span class="card-pill" id="appfolio-pill">0% — 0/10 phases</span>
         </div>
-        <div class="todo-list" id="appfolio-list" style="overflow-y: auto;"></div>
+        <div class="collapsible" id="af-wrap"><div class="todo-list" id="appfolio-list" style="overflow-y: auto;"></div></div>
     </div>
 </div> <!-- END TECH LEAD TAB -->
 
@@ -2219,11 +2225,32 @@ function renderNiniTab() {
     renderPriorities('nini-alignment',  n.alignment  || []);
 }
 
+// ── Collapsible Tech Lead sections (state persisted in localStorage) ──
+window.toggleSection = function(wrapId, caretId) {
+    const wrap = $(wrapId);
+    if (!wrap) return;
+    const collapsed = wrap.classList.toggle('collapsed');
+    const caret = $(caretId);
+    if (caret) caret.classList.toggle('collapsed', collapsed);
+    try { localStorage.setItem('collapse:' + wrapId, collapsed ? '1' : '0'); } catch (e) {}
+};
+function restoreSectionStates() {
+    [['cw-wrap', 'cw-caret'], ['pm-wrap', 'pm-caret'], ['af-wrap', 'af-caret']].forEach(([w, c]) => {
+        let v = null;
+        try { v = localStorage.getItem('collapse:' + w); } catch (e) {}
+        if (v === '1') {
+            const wrap = $(w); if (wrap) wrap.classList.add('collapsed');
+            const caret = $(c); if (caret) caret.classList.add('collapsed');
+        }
+    });
+}
+
 // ── Initial renders ──
 renderTechLeadTab();
 renderDufflesTab();
 renderAIEmailSystem();
 renderNiniTab();
+restoreSectionStates();
 
 // ── Accountability: re-render every 5 min so STALLED flags appear on their own ──
 setInterval(() => {
