@@ -264,6 +264,8 @@
         .priority-items { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; justify-content: flex-start; }
         /* Scrollable to-do / priority sections — cap height, scroll the overflow */
         #p-techlead-detail, #todo-list-main, #p-duffles-detail, #ai-phases-list, #blockers-list { max-height: 500px; overflow-y: auto; }
+        .item-remove { flex-shrink: 0; width: 18px; height: 18px; border: none; background: transparent; color: var(--text-3); cursor: pointer; font-size: 11px; padding: 0; display: flex; align-items: center; justify-content: center; transition: color 0.2s; align-self: center; }
+        .item-remove:hover { color: var(--red); }
         .priority-item {
             display: flex; align-items: center; gap: 7px;
             padding: 8px 9px; border-radius: 6px;
@@ -1316,6 +1318,7 @@ function renderPriorities(id, items) {
                 ${isDone ? '✓' : ''}
             </button>
             ${badge}
+            <button onclick="removePriorityItem('${id}', ${idx})" class="item-remove" title="Remove">✕</button>
         </div>`;
     }).join('');
 }
@@ -2236,6 +2239,22 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
         savePersonalData();
         rerender();
     }
+};
+
+// Remove a Tech Lead / Duffles priority item by index (client splice + Convex save).
+window.removePriorityItem = function(containerId, idx) {
+    let items = null, rerender = null;
+    if (containerId === 'p-techlead-detail' || containerId === 'p-techlead') {
+        items = DATA.team.techLead;
+        rerender = () => { renderTechLeadTab(); renderPriorities('p-techlead', DATA.team.techLead); setMemberBar('bar-tl', 'pct-tl', DATA.team.techLead); };
+    } else if (containerId === 'p-duffles-detail' || containerId === 'p-duffles') {
+        items = DATA.team.duffles;
+        rerender = () => { renderDufflesTab(); renderPriorities('p-duffles', DATA.team.duffles); setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles); };
+    }
+    if (!items || idx < 0 || idx >= items.length) return;
+    items.splice(idx, 1);
+    savePersonalData();
+    rerender();
 };
 
 
