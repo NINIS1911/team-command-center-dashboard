@@ -262,6 +262,8 @@
         .mp-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
         .mp-label { font-size: 9px; font-weight: 700; min-width: 26px; text-align: right; }
         .priority-items { display: flex; flex-direction: column; gap: 4px; flex: 1; overflow: hidden; justify-content: space-between; }
+        /* Scrollable to-do / priority sections — cap height, scroll the overflow */
+        #p-techlead-detail, #todo-list-main, #p-duffles-detail { max-height: 400px; overflow-y: auto; }
         .priority-item {
             display: flex; align-items: center; gap: 7px;
             padding: 8px 9px; border-radius: 6px;
