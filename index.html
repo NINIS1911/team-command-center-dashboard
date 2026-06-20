@@ -601,7 +601,6 @@
     <button class="tab-btn" onclick="switchTab('techlead', this)">👨‍💼 Tech Lead</button>
     <button class="tab-btn" onclick="switchTab('duffles', this)">👜 Duffles</button>
     <button class="tab-btn" onclick="switchTab('todos', this)">✅ Team To-Dos</button>
-    <button class="tab-btn" onclick="switchTab('nini', this)">🏢 NINI</button>
 </div>
 
 <!-- ══════════ TEAM TAB (MAIN DASHBOARD) ══════════ -->
@@ -986,27 +985,6 @@
 
 </div> <!-- END TODOS TAB -->
 
-<!-- ══════════ NINI TAB ══════════ -->
-<div id="nini-tab" class="tab-content" style="flex-direction: column; gap: 8px; overflow-y: auto;">
-    <div class="card" style="flex-shrink: 0;">
-        <div class="card-header">
-            <span class="card-title">🎯 Priorities</span>
-        </div>
-        <div class="priority-items" id="nini-priorities"></div>
-    </div>
-    <div class="card" style="flex-shrink: 0;">
-        <div class="card-header">
-            <span class="card-title">🚀 Strategic Initiatives</span>
-        </div>
-        <div class="priority-items" id="nini-strategic"></div>
-    </div>
-    <div class="card" style="flex-shrink: 0;">
-        <div class="card-header">
-            <span class="card-title">🤝 Team Alignment</span>
-        </div>
-        <div class="priority-items" id="nini-alignment"></div>
-    </div>
-</div> <!-- END NINI TAB -->
 
 <!-- ══════════════════════════════════════════════════════════
      📋  DASHBOARD DATA  —  EDIT THIS SECTION TO UPDATE BOARD
@@ -2247,12 +2225,6 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
             renderPriorities('p-duffles', DATA.team.duffles);
             setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles);
         };
-    } else if (containerId === 'nini-priorities') {
-        items = DATA.nini.priorities; rerender = renderNiniTab;
-    } else if (containerId === 'nini-strategic') {
-        items = DATA.nini.strategic;  rerender = renderNiniTab;
-    } else if (containerId === 'nini-alignment') {
-        items = DATA.nini.alignment;  rerender = renderNiniTab;
     }
 
     if (items && rerender) {
@@ -2264,13 +2236,6 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
     }
 };
 
-// ── NINI tab: 3 sections rendered via renderPriorities (pills/urgent/toggle) ──
-function renderNiniTab() {
-    const n = DATA.nini || {};
-    renderPriorities('nini-priorities', n.priorities || []);
-    renderPriorities('nini-strategic',  n.strategic  || []);
-    renderPriorities('nini-alignment',  n.alignment  || []);
-}
 
 // ── Collapsible Tech Lead sections (state persisted in localStorage) ──
 window.toggleSection = function(wrapId, caretId) {
@@ -2296,7 +2261,6 @@ function restoreSectionStates() {
 renderTechLeadTab();
 renderDufflesTab();
 renderAIEmailSystem();
-renderNiniTab();
 restoreSectionStates();
 
 // ── Accountability: re-render every 5 min so STALLED flags appear on their own ──
