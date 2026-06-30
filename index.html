@@ -604,6 +604,7 @@
     <button class="tab-btn active" onclick="switchTab('team', this)">🧠 Team Command Center</button>
     <button class="tab-btn" onclick="switchTab('techlead', this)">👨‍💼 Tech Lead</button>
     <button class="tab-btn" onclick="switchTab('duffles', this)">👜 Duffles</button>
+    <button class="tab-btn" onclick="switchTab('benji', this)">🏠 Benji</button>
     <button class="tab-btn" onclick="switchTab('todos', this)">✅ Team To-Dos</button>
 </div>
 
@@ -872,6 +873,44 @@
     </div>
 </div> <!-- END DUFFLES TAB -->
 
+<!-- ══════════ BENJI TAB ══════════ -->
+<div id="benji-tab" class="tab-content" style="flex-direction: column; gap: 8px; overflow-y: auto;">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🏠 Benji — Acquisitions</span>
+            <span class="card-pill" id="benji-week-label">Week of —</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-shrink: 0;">
+            <div class="ring-wrap">
+                <svg width="52" height="52" viewBox="0 0 52 52">
+                    <circle class="ring-bg"   cx="26" cy="26" r="21"/>
+                    <circle class="ring-fill" cx="26" cy="26" r="21"
+                        id="benji-ring-fill"
+                        stroke="var(--green)"
+                        stroke-dasharray="131.9"
+                        stroke-dashoffset="131.9"/>
+                </svg>
+                <div class="ring-label" id="benji-ring-label">0%</div>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-1);" id="benji-perf-title">—</div>
+                <div style="font-size: 10px; color: var(--text-2); margin-top: 2px;" id="benji-perf-sub">—</div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2);">🎯 Current Work</div>
+            <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                <input type="text" id="benji-add-input" placeholder="Add Benji item…" onkeypress="if(event.key==='Enter') addItem('benji')"
+                    style="flex:1; padding:7px 10px; background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.15); border-radius:6px; color:var(--text-1); font-size:11px; font-family:inherit;">
+                <label style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text-2); cursor:pointer; user-select:none; white-space:nowrap;"><input type="checkbox" id="benji-add-urgent" style="cursor:pointer;">Urgent</label>
+                <button onclick="addItem('benji')" style="padding:7px 12px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:11px; cursor:pointer; font-family:inherit;">Add</button>
+            </div>
+            <div class="priority-items" id="p-benji-detail"></div>
+        </div>
+    </div>
+</div> <!-- END BENJI TAB -->
+
 <!-- ══════════ PERSONAL TO-DOS TAB ══════════ -->
 <div id="todos-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
 
@@ -1040,7 +1079,9 @@ const DATA = {
             { text: "Confirm two new hat designs.",          status: "todo" },
             { text: "All hat designs shipped?",              status: "todo" },
             { text: "June 7th video shoot, plan revise.",    status: "todo" }
-        ]
+        ],
+        // Benji — Acquisitions / deals & pipeline (starting this week, empty to start)
+        benji: []
     },
 
     // ── PROJECT HEALTH ──
@@ -1199,6 +1240,13 @@ if (_saved) {
     await convex.mutation("dashboard:set", { value: DATA });
 }
 let _myRev = DATA._rev || 0;
+
+// Migration: ensure newer team members exist on top of any older persisted blob.
+// The Object.assign above is a SHALLOW merge, so a previously-saved `team`
+// (techLead + duffles only) would clobber the default and leave benji undefined,
+// which would crash renderBenjiTab()/addItem('benji'). Seed it if missing.
+if (!DATA.team) DATA.team = {};
+if (!Array.isArray(DATA.team.benji)) DATA.team.benji = [];
 
 const $ = id => document.getElementById(id);
 const CIRCUMFERENCE = 2 * Math.PI * 21;
@@ -1813,6 +1861,11 @@ window.addItem = function(which) {
             add: (t, u) => DATA.team.duffles.push({ text: t, status: 'todo', urgent: u, lastMoved: Date.now() }),
             render: () => { renderDufflesTab(); renderPriorities('p-duffles', DATA.team.duffles); setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles); },
         },
+        benji: {
+            input: 'benji-add-input', urgent: 'benji-add-urgent',
+            add: (t, u) => DATA.team.benji.push({ text: t, status: 'todo', urgent: u, lastMoved: Date.now() }),
+            render: () => { renderBenjiTab(); },
+        },
     }[which];
     if (!cfg) return;
     const input = $(cfg.input);
@@ -2202,6 +2255,39 @@ function renderDufflesTab() {
     }
 }
 
+function renderBenjiTab() {
+    // Render his priority items
+    renderPriorities('p-benji-detail', DATA.team.benji);
+
+    // Update his progress ring
+    const pct = calcPct(DATA.team.benji);
+    const color = scoreColor(pct);
+    const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+
+    setTimeout(() => {
+        const ring = $('benji-ring-fill');
+        if (ring) {
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = color;
+        }
+    }, 100);
+
+    if ($('benji-ring-label')) {
+        $('benji-ring-label').textContent = pct + '%';
+        $('benji-ring-label').style.color = color;
+    }
+    if ($('benji-perf-title')) {
+        $('benji-perf-title').textContent = scoreLabel(pct);
+        $('benji-perf-title').style.color = color;
+    }
+    if ($('benji-perf-sub')) {
+        $('benji-perf-sub').textContent = `${DATA.team.benji.filter(i => i.status === 'done').length} of ${DATA.team.benji.length} tasks done`;
+    }
+    if ($('benji-week-label')) {
+        $('benji-week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
+    }
+}
+
 // ── Toggle Priority Status ──
 window.togglePriorityStatus = function(containerId, itemIdx) {
     // Determine which team member this is
@@ -2226,6 +2312,9 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
             renderPriorities('p-duffles', DATA.team.duffles);
             setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles);
         };
+    } else if (containerId === 'p-benji-detail') {
+        items = DATA.team.benji;
+        rerender = renderBenjiTab;
     }
 
     if (items && rerender) {
@@ -2246,6 +2335,9 @@ window.removePriorityItem = function(containerId, idx) {
     } else if (containerId === 'p-duffles-detail' || containerId === 'p-duffles') {
         items = DATA.team.duffles;
         rerender = () => { renderDufflesTab(); renderPriorities('p-duffles', DATA.team.duffles); setMemberBar('bar-dh', 'pct-dh', DATA.team.duffles); };
+    } else if (containerId === 'p-benji-detail') {
+        items = DATA.team.benji;
+        rerender = () => { renderBenjiTab(); };
     }
     if (!items || idx < 0 || idx >= items.length) return;
     items.splice(idx, 1);
@@ -2277,6 +2369,7 @@ function restoreSectionStates() {
 // ── Initial renders ──
 renderTechLeadTab();
 renderDufflesTab();
+renderBenjiTab();
 renderAIEmailSystem();
 restoreSectionStates();
 
@@ -2286,6 +2379,7 @@ setInterval(() => {
     renderPriorities('p-duffles', DATA.team.duffles);
     renderPriorities('p-techlead-detail', DATA.team.techLead);
     renderPriorities('p-duffles-detail', DATA.team.duffles);
+    renderPriorities('p-benji-detail', DATA.team.benji);
     renderPersonalTodos();
 }, 300000);
 
