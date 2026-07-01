@@ -640,10 +640,9 @@
         <div class="team-columns">
             <div class="team-member-card">
                 <div class="member-header">
-                    <div class="avatar av-tech">TL</div>
+                    <div class="avatar av-tech">Gu</div>
                     <div class="member-info">
-                        <div class="member-name">Tech Lead</div>
-                        <div class="member-role">Ops · AI PM Build · $2,400/mo</div>
+                        <div class="member-name">Guillermo</div>
                     </div>
                 </div>
                 <div class="member-progress">
@@ -1087,7 +1086,7 @@ const DATA = {
     // ── PROJECT HEALTH ──
     // STATUS OPTIONS: "green" | "yellow" | "red" | "gray"
     projects: [
-        { name: "AI PM System",   status: "yellow", owner: "Tech Lead", note: "AppFolio + dashboard in build"  },
+        { name: "AI PM System",   status: "yellow", owner: "Guillermo", note: "AppFolio + dashboard in build"  },
         { name: "Broker License", status: "yellow", owner: "Me",        note: "Waiting on DRE exam date"       },
         { name: "Pilot License",  status: "yellow", owner: "Me",        note: "Training starts May 29"         },
         { name: "Duffles",        status: "green",  owner: "Gael",      note: "Onboarding Monday 5/25"         },
@@ -1316,7 +1315,7 @@ setInterval(updateWeekProgress, 60000); // re-check every minute
 $('today-section').innerHTML = `
     <div class="today-item">
         <div class="today-dot"></div>
-        <span class="today-who">TL Today</span>
+        <span class="today-who">Guillermo Today</span>
         <span class="today-task">${DATA.today.techLead}</span>
     </div>
     <div class="today-item">
@@ -1464,7 +1463,7 @@ $('vel-week').textContent  = `${DATA.velocity.thisWeek} this week`;
 
 // ── Per-member performance rows ──
 const members = [
-    { name: 'Tech Lead', items: DATA.team.techLead },
+    { name: 'Guillermo', items: DATA.team.techLead },
     { name: 'Gael (CMO)', items: DATA.team.duffles }
 ];
 $('perf-members').innerHTML = members.map((m, i) => {
