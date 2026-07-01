@@ -702,9 +702,10 @@
 
     <div class="card">
         <div class="card-header">
-            <span class="card-title">✅ Wins This Week</span>
+            <span class="card-title">🏠 Team To-Dos</span>
+            <span class="card-pill">Reminders</span>
         </div>
-        <div class="wins-list" id="wins-list"></div>
+        <div class="todo-list" id="todo-list-dash" style="overflow-y:auto;"></div>
     </div>
 
     <div class="card alert">
@@ -1425,9 +1426,10 @@ $('deadline-list').innerHTML = DATA.deadlines.map(d => `
         ${d.urgent ? '<span class="urgent-pill">NOW</span>' : ''}
     </div>`).join('');
 
-// ── Wins ──
-$('wins-list').innerHTML = DATA.wins.map(w => `
-    <div class="win-item"><span>✅</span><span>${w}</span></div>`).join('');
+// ── Team To-Dos now occupy the old "Wins This Week" slot on the main dashboard. ──
+// They render via renderPersonalTodos() → #todo-list-dash and are a reminder list
+// only (they do NOT affect Team Performance). DATA.wins is kept in data but no longer
+// shown on the main grid, so "Wins This Week" can be restored later if wanted.
 
 // ── Blockers + Completed This Week ──
 renderBlockers();
@@ -1668,6 +1670,18 @@ function renderPersonalTodos() {
             <button onclick="deleteTodo(${i})" class="item-remove" title="Delete">✕</button>
         </div>`;
     }).join('');
+
+    // Mirror the to-dos onto the main dashboard (they replaced the old "Wins This Week"
+    // card). Reminder list only — toggling here re-runs this function so both views sync.
+    if ($('todo-list-dash')) {
+        $('todo-list-dash').innerHTML = todos.length ? todos.map((t, i) => `
+        <div class="todo-item ${t.done ? 'done' : ''}${isStalled(t) ? ' is-stalled' : ''}" id="dash-todo-${i}">
+            <div class="todo-check" onclick="toggleTodo(${i})">${t.done ? '✓' : ''}</div>
+            <div class="todo-text">${t.text}</div>
+            ${(t.urgent && !t.done) ? '<span class="p-urgent">Urgent</span>' : ''}
+            <button onclick="deleteTodo(${i})" class="item-remove" title="Delete">✕</button>
+        </div>`).join('') : '<div style="font-size:11px; color:var(--text-2); padding:6px 4px;">No to-dos yet — add them in the Team To-Dos tab.</div>';
+    }
 
     // Update progress ring
     const ringColor = scoreColor(pct);
