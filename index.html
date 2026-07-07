@@ -817,22 +817,6 @@
             <div class="collapsible" id="cw-wrap"><div class="priority-items" id="p-techlead-detail"></div></div>
         </div>
     </div>
-
-    <div class="card" style="flex-shrink: 0;">
-        <div class="card-header" onclick="toggleSection('pm-wrap','pm-caret')" style="cursor: pointer; user-select: none;">
-            <span class="card-title"><span class="collapse-caret" id="pm-caret">▼</span>🏗️ PM System Build</span>
-            <span class="card-pill" id="tech-pill">0% — 6 phases</span>
-        </div>
-        <div class="collapsible" id="pm-wrap"><div id="ai-phases-list" style="display: flex; flex-direction: column; gap: 6px;"></div></div>
-    </div>
-
-    <div class="card" style="flex-shrink: 0;">
-        <div class="card-header" onclick="toggleSection('af-wrap','af-caret')" style="cursor: pointer; user-select: none;">
-            <span class="card-title"><span class="collapse-caret" id="af-caret">▼</span>🏢 AppFolio Setup</span>
-            <span class="card-pill" id="appfolio-pill">0% — 0/10 phases</span>
-        </div>
-        <div class="collapsible" id="af-wrap"><div class="todo-list" id="appfolio-list" style="overflow-y: auto;"></div></div>
-    </div>
 </div> <!-- END TECH LEAD TAB -->
 
 <!-- ══════════ DUFFLES TAB ══════════ -->
@@ -1434,9 +1418,6 @@ $('deadline-list').innerHTML = DATA.deadlines.map(d => `
 // ── Blockers + Completed This Week ──
 renderBlockers();
 
-// ── AppFolio Setup checklist (Tech Lead tab) ──
-renderAppfolioSetup();
-
 // ── Top alert banner (live Friday countdown, refresh each minute) ──
 renderTopBanner();
 setInterval(renderTopBanner, 60000);
@@ -1784,27 +1765,6 @@ window.toggleBlocker = function(i) {
     DATA.blockers[i].lastMoved = Date.now();
     savePersonalData();
     renderBlockers();
-};
-
-// ── AppFolio Setup: 10-phase checklist, one checkbox per phase ──
-function renderAppfolioSetup() {
-    const items = DATA.appfolioSetup || [];
-    const el = $('appfolio-list');
-    if (!el) return;
-    const doneN = items.filter(p => p.done).length;
-    const pct = items.length ? Math.round(doneN / items.length * 100) : 0;
-    if ($('appfolio-pill')) $('appfolio-pill').textContent = `${pct}% — ${doneN}/${items.length} phases`;
-    el.innerHTML = items.map((p, i) => `
-        <div class="todo-item ${p.done ? 'done' : ''}">
-            <div class="todo-check" onclick="toggleAppfolioPhase(${i})">${p.done ? '✓' : ''}</div>
-            <div class="todo-text"><strong style="color:var(--accent);">Phase ${p.phase}</strong> — ${p.text}</div>
-        </div>`).join('') || '<div class="blocker-empty">No AppFolio setup phases defined.</div>';
-}
-
-window.toggleAppfolioPhase = function(i) {
-    DATA.appfolioSetup[i].done = !DATA.appfolioSetup[i].done;
-    savePersonalData();
-    renderAppfolioSetup();
 };
 
 // ── Top alert banner: data-driven (DATA.banner = {active, text, deadline}) ──
@@ -2171,68 +2131,7 @@ function renderTechLeadTab() {
     if ($('tl-week-label')) {
         $('tl-week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
     }
-
-    // Render AI Email System
-    renderAIEmailSystem();
 }
-
-// ── Render AI Email System ──
-function renderAIEmailSystem() {
-    const phases = DATA.techTasks;
-    const allTasks = phases.flatMap(p => p.tasks);
-    const totalDone = allTasks.filter(t => t.done).length;
-    const totalTasks = allTasks.length;
-    const pct = totalTasks > 0 ? Math.round(totalDone / totalTasks * 100) : 0;
-
-    if ($('tech-pill')) {
-        $('tech-pill').textContent = `${pct}% — 6 phases`;
-    }
-
-    // Render phases
-    $('ai-phases-list').innerHTML = phases.map((phase, phaseIdx) => {
-        const phaseTasks = phase.tasks;
-        const phaseDone = phaseTasks.filter(t => t.done).length;
-        const phasePct = phaseTasks.length > 0 ? Math.round(phaseDone / phaseTasks.length * 100) : 0;
-        const phaseColor = scoreColor(phasePct);
-
-        return `
-            <div style="padding: 8px 10px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid var(--border);">
-                <button onclick="toggleAIPhase(${phaseIdx})" style="width: 100%; padding: 0; background: none; border: none; color: inherit; cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; font-family: inherit;">
-                    <span style="color: var(--text-1);">${phase.phase}</span>
-                    <span id="ai-phase-toggle-${phaseIdx}">▼</span>
-                </button>
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 10px; margin-top: 6px;">
-                    <div style="flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;">
-                        <div style="height: 100%; background: ${phaseColor}; width: ${phasePct}%; border-radius: 2px; transition: width 0.3s;"></div>
-                    </div>
-                    <span style="color: var(--text-2); font-weight: 600;">${phaseDone}/${phaseTasks.length}</span>
-                </div>
-                <div id="ai-phase-content-${phaseIdx}" style="display: none; flex-direction: column; gap: 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.05);">
-                    ${phaseTasks.map((task, taskIdx) => `
-                        <div style="display: flex; align-items: flex-start; gap: 6px; padding: 6px; border-radius: 4px; background: ${task.done ? 'rgba(63,185,80,0.08)' : 'transparent'}; cursor: pointer; transition: background 0.2s;" onclick="toggleAITask(${phaseIdx}, ${taskIdx})">
-                            <input type="checkbox" ${task.done ? 'checked' : ''} style="width: 14px; height: 14px; margin-top: 2px; cursor: pointer; accent-color: var(--green);" onclick="event.stopPropagation(); toggleAITask(${phaseIdx}, ${taskIdx})">
-                            <span style="font-size: 10px; line-height: 1.4; flex: 1; ${task.done ? 'text-decoration: line-through; color: var(--text-2);' : 'color: var(--text-1);'}">${task.text}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-window.toggleAIPhase = function(phaseIdx) {
-    const content = $(`ai-phase-content-${phaseIdx}`);
-    const icon = $(`ai-phase-toggle-${phaseIdx}`);
-    const isHidden = content.style.display === 'none';
-    content.style.display = isHidden ? 'flex' : 'none';
-    icon.textContent = isHidden ? '▲' : '▼';
-};
-
-window.toggleAITask = function(phaseIdx, taskIdx) {
-    DATA.techTasks[phaseIdx].tasks[taskIdx].done = !DATA.techTasks[phaseIdx].tasks[taskIdx].done;
-    savePersonalData();
-    renderAIEmailSystem();
-};
 
 // ── Render Duffles Tab ──
 function renderDufflesTab() {
@@ -2369,7 +2268,7 @@ window.toggleSection = function(wrapId, caretId) {
     try { localStorage.setItem('collapse:' + wrapId, collapsed ? '1' : '0'); } catch (e) {}
 };
 function restoreSectionStates() {
-    [['cw-wrap', 'cw-caret'], ['pm-wrap', 'pm-caret'], ['af-wrap', 'af-caret']].forEach(([w, c]) => {
+    [['cw-wrap', 'cw-caret']].forEach(([w, c]) => {
         let v = null;
         try { v = localStorage.getItem('collapse:' + w); } catch (e) {}
         if (v === '1') {
@@ -2383,7 +2282,6 @@ function restoreSectionStates() {
 renderTechLeadTab();
 renderDufflesTab();
 renderBenjiTab();
-renderAIEmailSystem();
 restoreSectionStates();
 
 // ── Accountability: re-render every 5 min so STALLED flags appear on their own ──
