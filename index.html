@@ -605,6 +605,7 @@
     <button class="tab-btn" onclick="switchTab('techlead', this)">👨‍💼 Tech Lead</button>
     <button class="tab-btn" onclick="switchTab('duffles', this)">👜 CPG Brand</button>
     <button class="tab-btn" onclick="switchTab('benji', this)">🏠 Benji</button>
+    <button class="tab-btn" onclick="switchTab('julian', this)">🔨 Julian</button>
     <button class="tab-btn" onclick="switchTab('todos', this)">✅ Team To-Dos</button>
 </div>
 
@@ -895,6 +896,44 @@
     </div>
 </div> <!-- END BENJI TAB -->
 
+<!-- ══════════ JULIAN TAB ══════════ -->
+<div id="julian-tab" class="tab-content" style="flex-direction: column; gap: 8px; overflow-y: auto;">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🔨 Julian — Construction</span>
+            <span class="card-pill" id="julian-week-label">Week of —</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-shrink: 0;">
+            <div class="ring-wrap">
+                <svg width="52" height="52" viewBox="0 0 52 52">
+                    <circle class="ring-bg"   cx="26" cy="26" r="21"/>
+                    <circle class="ring-fill" cx="26" cy="26" r="21"
+                        id="julian-ring-fill"
+                        stroke="var(--green)"
+                        stroke-dasharray="131.9"
+                        stroke-dashoffset="131.9"/>
+                </svg>
+                <div class="ring-label" id="julian-ring-label">0%</div>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-1);" id="julian-perf-title">—</div>
+                <div style="font-size: 10px; color: var(--text-2); margin-top: 2px;" id="julian-perf-sub">—</div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2);">🎯 Current Work</div>
+            <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                <input type="text" id="julian-add-input" placeholder="Add Julian item…" onkeypress="if(event.key==='Enter') addItem('julian')"
+                    style="flex:1; padding:7px 10px; background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.15); border-radius:6px; color:var(--text-1); font-size:11px; font-family:inherit;">
+                <label style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text-2); cursor:pointer; user-select:none; white-space:nowrap;"><input type="checkbox" id="julian-add-urgent" style="cursor:pointer;">Urgent</label>
+                <button onclick="addItem('julian')" style="padding:7px 12px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:11px; cursor:pointer; font-family:inherit;">Add</button>
+            </div>
+            <div class="priority-items" id="p-julian-detail"></div>
+        </div>
+    </div>
+</div> <!-- END JULIAN TAB -->
+
 <!-- ══════════ PERSONAL TO-DOS TAB ══════════ -->
 <div id="todos-tab" class="tab-content" style="flex-direction:column; gap:8px; overflow-y:auto;">
 
@@ -1065,7 +1104,9 @@ const DATA = {
             { text: "June 7th video shoot, plan revise.",    status: "todo" }
         ],
         // Benji — Acquisitions / deals & pipeline (starting this week, empty to start)
-        benji: []
+        benji: [],
+        // Julian — Construction / on-site work (starting this week, empty to start)
+        julian: []
     },
 
     // ── PROJECT HEALTH ──
@@ -1231,6 +1272,7 @@ let _myRev = DATA._rev || 0;
 // which would crash renderBenjiTab()/addItem('benji'). Seed it if missing.
 if (!DATA.team) DATA.team = {};
 if (!Array.isArray(DATA.team.benji)) DATA.team.benji = [];
+if (!Array.isArray(DATA.team.julian)) DATA.team.julian = [];
 
 const $ = id => document.getElementById(id);
 const CIRCUMFERENCE = 2 * Math.PI * 21;
@@ -1839,6 +1881,11 @@ window.addItem = function(which) {
             add: (t, u) => DATA.team.benji.push({ text: t, status: 'todo', urgent: u, lastMoved: Date.now() }),
             render: () => { renderBenjiTab(); },
         },
+        julian: {
+            input: 'julian-add-input', urgent: 'julian-add-urgent',
+            add: (t, u) => DATA.team.julian.push({ text: t, status: 'todo', urgent: u, lastMoved: Date.now() }),
+            render: () => { renderJulianTab(); },
+        },
     }[which];
     if (!cfg) return;
     const input = $(cfg.input);
@@ -2200,6 +2247,39 @@ function renderBenjiTab() {
     }
 }
 
+function renderJulianTab() {
+    // Render his priority items
+    renderPriorities('p-julian-detail', DATA.team.julian);
+
+    // Update his progress ring
+    const pct = calcPct(DATA.team.julian);
+    const color = scoreColor(pct);
+    const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+
+    setTimeout(() => {
+        const ring = $('julian-ring-fill');
+        if (ring) {
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = color;
+        }
+    }, 100);
+
+    if ($('julian-ring-label')) {
+        $('julian-ring-label').textContent = pct + '%';
+        $('julian-ring-label').style.color = color;
+    }
+    if ($('julian-perf-title')) {
+        $('julian-perf-title').textContent = scoreLabel(pct);
+        $('julian-perf-title').style.color = color;
+    }
+    if ($('julian-perf-sub')) {
+        $('julian-perf-sub').textContent = `${DATA.team.julian.filter(i => i.status === 'done').length} of ${DATA.team.julian.length} tasks done`;
+    }
+    if ($('julian-week-label')) {
+        $('julian-week-label').textContent = `Week of ${_mo[_n.getMonth()]} ${_n.getDate()}`;
+    }
+}
+
 // ── Toggle Priority Status ──
 window.togglePriorityStatus = function(containerId, itemIdx) {
     // Determine which team member this is
@@ -2227,6 +2307,9 @@ window.togglePriorityStatus = function(containerId, itemIdx) {
     } else if (containerId === 'p-benji-detail') {
         items = DATA.team.benji;
         rerender = renderBenjiTab;
+    } else if (containerId === 'p-julian-detail') {
+        items = DATA.team.julian;
+        rerender = renderJulianTab;
     }
 
     if (items && rerender) {
@@ -2250,6 +2333,9 @@ window.removePriorityItem = function(containerId, idx) {
     } else if (containerId === 'p-benji-detail') {
         items = DATA.team.benji;
         rerender = () => { renderBenjiTab(); };
+    } else if (containerId === 'p-julian-detail') {
+        items = DATA.team.julian;
+        rerender = () => { renderJulianTab(); };
     }
     if (!items || idx < 0 || idx >= items.length) return;
     items.splice(idx, 1);
@@ -2282,6 +2368,7 @@ function restoreSectionStates() {
 renderTechLeadTab();
 renderDufflesTab();
 renderBenjiTab();
+renderJulianTab();
 restoreSectionStates();
 
 // ── Accountability: re-render every 5 min so STALLED flags appear on their own ──
@@ -2291,6 +2378,7 @@ setInterval(() => {
     renderPriorities('p-techlead-detail', DATA.team.techLead);
     renderPriorities('p-duffles-detail', DATA.team.duffles);
     renderPriorities('p-benji-detail', DATA.team.benji);
+    renderPriorities('p-julian-detail', DATA.team.julian);
     renderPersonalTodos();
 }, 300000);
 
