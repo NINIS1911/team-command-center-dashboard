@@ -603,7 +603,7 @@
 <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('team', this)">🧠 Team Command Center</button>
     <button class="tab-btn" onclick="switchTab('techlead', this)">👨‍💼 Tech Lead</button>
-    <button class="tab-btn" onclick="switchTab('duffles', this)">👜 Duffles</button>
+    <button class="tab-btn" onclick="switchTab('duffles', this)">👜 CPG Brand</button>
     <button class="tab-btn" onclick="switchTab('benji', this)">🏠 Benji</button>
     <button class="tab-btn" onclick="switchTab('todos', this)">✅ Team To-Dos</button>
 </div>
@@ -656,7 +656,7 @@
                     <div class="avatar av-duffles">G</div>
                     <div class="member-info">
                         <div class="member-name">Gael</div>
-                        <div class="member-role">CMO · Duffles · Part-time</div>
+                        <div class="member-role">CMO · CPG Brand · Part-time</div>
                     </div>
                 </div>
                 <div class="member-progress">
@@ -823,7 +823,7 @@
 <div id="duffles-tab" class="tab-content" style="flex-direction: column; gap: 8px; overflow-y: auto;">
     <div class="card">
         <div class="card-header">
-            <span class="card-title">👜 Duffles — Gael</span>
+            <span class="card-title">👜 CPG Brand — Gael</span>
             <span class="card-pill" id="gael-week-label">Week of —</span>
         </div>
         <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-shrink: 0;">
@@ -847,7 +847,7 @@
         <div style="display: flex; flex-direction: column; gap: 6px;">
             <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2);">🎯 Current Work</div>
             <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
-                <input type="text" id="duf-add-input" placeholder="Add Duffles item…" onkeypress="if(event.key==='Enter') addItem('duffles')"
+                <input type="text" id="duf-add-input" placeholder="Add CPG Brand item…" onkeypress="if(event.key==='Enter') addItem('duffles')"
                     style="flex:1; padding:7px 10px; background:rgba(88,166,255,0.05); border:1px solid rgba(88,166,255,0.15); border-radius:6px; color:var(--text-1); font-size:11px; font-family:inherit;">
                 <label style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text-2); cursor:pointer; user-select:none; white-space:nowrap;"><input type="checkbox" id="duf-add-urgent" style="cursor:pointer;">Urgent</label>
                 <button onclick="addItem('duffles')" style="padding:7px 12px; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.2); border-radius:6px; color:var(--accent); font-weight:700; font-size:11px; cursor:pointer; font-family:inherit;">Add</button>
@@ -1074,7 +1074,7 @@ const DATA = {
         { name: "AI PM System",   status: "yellow", owner: "Guillermo", note: "AppFolio + dashboard in build"  },
         { name: "Broker License", status: "yellow", owner: "Me",        note: "Waiting on DRE exam date"       },
         { name: "Pilot License",  status: "yellow", owner: "Me",        note: "Training starts May 29"         },
-        { name: "Duffles",        status: "green",  owner: "Gael",      note: "Onboarding Monday 5/25"         },
+        { name: "CPG Brand",      status: "green",  owner: "Gael",      note: "Onboarding Monday 5/25"         },
         { name: "Acquisitions",   status: "gray",   owner: "Me",        note: "Paused — restart June 15"       }
     ],
 
@@ -1097,7 +1097,7 @@ const DATA = {
         { date: "5/24",  text: "EDD CA Employer Account # — awaiting mail", urgent: false },
         { date: "5/29",  text: "PM Attorney meeting (online)",               urgent: false },
         { date: "5/29",  text: "Pilot training begins",                      urgent: false },
-        { date: "6/7",   text: "Duffles video shoot",                        urgent: false },
+        { date: "6/7",   text: "CPG Brand video shoot",                      urgent: false },
         { date: "6/15",  text: "Acquisitions restart",                       urgent: false },
         { date: "8/15",  text: "$800 CA franchise tax due",                  urgent: false }
     ],
@@ -1106,7 +1106,7 @@ const DATA = {
     wins: [
         "AppFolio API received — build unblocked",
         "All 4 Columbia Bank accounts open",
-        "Instagram + TikTok live — Duffles accounts set up",
+        "Instagram + TikTok live — CPG Brand accounts set up",
         "CPA locked (AppFolio integrated)",
         "PM company setup complete"
     ],
