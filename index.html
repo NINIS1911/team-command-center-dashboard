@@ -1465,10 +1465,10 @@ renderTopBanner();
 setInterval(renderTopBanner, 60000);
 
 // ── Team Performance Ring ──
-const allItems   = [...DATA.team.techLead, ...DATA.team.duffles];
+const allItems   = [...DATA.team.techLead, ...DATA.team.duffles, ...DATA.team.benji, ...DATA.team.julian];
 const totalDone  = allItems.filter(i => i.status === 'done').length;
 const totalAll   = allItems.length;
-const overallPct = Math.round(totalDone / totalAll * 100);
+const overallPct = totalAll ? Math.round(totalDone / totalAll * 100) : 0;
 const color      = scoreColor(overallPct);
 const offset     = CIRCUMFERENCE - (overallPct / 100) * CIRCUMFERENCE;
 setTimeout(() => {
@@ -1489,7 +1489,9 @@ $('vel-week').textContent  = `${DATA.velocity.thisWeek} this week`;
 // ── Per-member performance rows ──
 const members = [
     { name: 'Guillermo', items: DATA.team.techLead },
-    { name: 'Gael (CMO)', items: DATA.team.duffles }
+    { name: 'Gael (CMO)', items: DATA.team.duffles },
+    { name: 'Benji', items: DATA.team.benji },
+    { name: 'Julian', items: DATA.team.julian }
 ];
 $('perf-members').innerHTML = members.map((m, i) => {
     const pct = calcPct(m.items), c = scoreColor(pct);
