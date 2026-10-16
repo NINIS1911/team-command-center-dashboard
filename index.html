@@ -53,12 +53,20 @@ header{display:flex;justify-content:space-between;align-items:center;flex-shrink
 .span-rows{grid-row:span 2}
 
 /* MONEY */
-.money-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+.money-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stat{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:6px 8px;min-width:0}
 .stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-2)}
-.stat-value{font-size:20px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
-.stat-sub{font-size:10px;color:var(--text-2);margin-top:1px}
+.stat-value{font-size:16px;font-weight:800;margin-top:1px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat-sub{font-size:9px;color:var(--text-2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .green-t{color:var(--green)}.red-t{color:var(--red)}.yellow-t{color:var(--yellow)}.accent-t{color:var(--accent)}
+
+.cash-title{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-2);margin-top:4px}
+.cash-list{display:flex;flex-direction:column;gap:3px}
+.cash{display:grid;grid-template-columns:70px 1fr auto;gap:6px;align-items:center;font-size:10.5px;padding:2px 8px;border-radius:5px;background:rgba(255,255,255,.02);border:1px solid var(--border)}
+.cash .cd8{font-size:10px;color:var(--text-2);white-space:nowrap}
+.cash .amt{font-weight:800;font-variant-numeric:tabular-nums;color:var(--red)}
+.cash.soon{border-color:rgba(248,81,73,.45)}
+.cash-total{display:flex;justify-content:space-between;font-size:11px;font-weight:800;padding:2px 8px}
 
 /* HAT DROP */
 .hat-styles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
@@ -76,11 +84,11 @@ header{display:flex;justify-content:space-between;align-items:center;flex-shrink
 
 /* TIMELINE */
 .steps{display:flex;flex-direction:column;gap:3px;overflow:hidden}
-.step{display:grid;grid-template-columns:18px 70px 1fr;align-items:center;gap:6px;font-size:11px;padding:3px 6px;border-radius:5px}
+.step{display:grid;grid-template-columns:18px 74px minmax(0,1fr);align-items:center;gap:6px;font-size:11px;padding:2px 6px;border-radius:5px}
 .step.done{color:var(--text-2)}
 .step.done .step-text{text-decoration:line-through;text-decoration-color:var(--text-3)}
 .step.next{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.35)}
-.step-date{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.step-date{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .step.next .step-date{color:var(--red);font-weight:700}
 
 /* FLAVORS */
@@ -98,15 +106,16 @@ header{display:flex;justify-content:space-between;align-items:center;flex-shrink
 
 /* TODOS */
 .todo-list{display:flex;flex-direction:column;gap:4px;overflow:hidden;flex:1}
-.todo{display:grid;grid-template-columns:18px 64px 1fr auto;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:11.5px;cursor:pointer;user-select:none}
+.todo{display:grid;grid-template-columns:18px 74px minmax(0,1fr) auto;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:11.5px;cursor:pointer;user-select:none}
 .todo:hover{border-color:var(--accent)}
 .todo.overdue{border-color:rgba(248,81,73,.5);background:rgba(248,81,73,.06)}
 .todo.today{border-color:rgba(210,153,34,.55);background:rgba(210,153,34,.06)}
 .todo.done{opacity:.4}
 .todo.done .todo-text{text-decoration:line-through}
+.todo-text,.step-text,.cash span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .todo-check{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--text-2);display:flex;align-items:center;justify-content:center;font-size:10px}
 .todo.done .todo-check{background:var(--green);border-color:var(--green);color:#000}
-.todo-date{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.todo-date{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .todo.overdue .todo-date{color:var(--red);font-weight:700}
 .todo.today .todo-date{color:var(--yellow);font-weight:700}
 .tag{font-size:8px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:3px;text-transform:uppercase}
@@ -150,6 +159,8 @@ header{display:flex;justify-content:space-between;align-items:center;flex-shrink
   <div class="card">
     <div class="card-header"><span class="card-title">💰 Money</span><span class="pill" id="money-pill">Self-funded</span></div>
     <div class="money-grid" id="money-grid"></div>
+    <div class="cash-title">💸 Upcoming cash out</div>
+    <div class="cash-list" id="cash-list"></div>
   </div>
 
   <!-- HAT DROP -->
@@ -182,7 +193,7 @@ header{display:flex;justify-content:space-between;align-items:center;flex-shrink
 
   <!-- FLAVORS -->
   <div class="card">
-    <div class="card-header"><span class="card-title">🎨 10 Flavors · 5 Pantone Colors</span><span class="pill">$20 wholesale · 15 distributors</span></div>
+    <div class="card-header"><span class="card-title">🎨 10 Flavors · 5 Colors</span><span class="pill">$20 · 15 distributors · $100K if sold out</span></div>
     <div class="flavor-grid" id="flavor-grid"></div>
     <div class="boxes" id="boxes"></div>
   </div>
@@ -214,22 +225,29 @@ const DEFAULTS = {
   ],
 
   money: [
-    { label:'Paid to date',      value:'$1,941.50', sub:'Hat deposit + wire + 3 samples', cls:'' },
-    { label:'Hat balance owed',  value:'$3,333.50', sub:'Due Mon 12/14',                  cls:'red-t' },
-    { label:'Pen order budget',  value:'$72,500',   sub:'+ terps · ~$14.50/kit',           cls:'yellow-t' },
-    { label:'Revenue to date',   value:'$0',        sub:'First drop 12/1',                 cls:'green-t' },
-    { label:'Hats sold-out',     value:'$15,000',   sub:'~$9,725 profit',                  cls:'accent-t' },
-    { label:'Pens sold-out',     value:'$100,000',  sub:'~$27,500 profit · BE 73%',        cls:'accent-t' },
-    { label:'Recurring',         value:'$39/mo',    sub:'Shopify',                         cls:'' },
-    { label:'Hat cost / unit',   value:'$17.58',    sub:'Retail $50 · ~$33 margin',        cls:'' },
+    { label:'Paid',      value:'$1,941.50', sub:'Hat deposit + wire + 3 samples', cls:'' },
+    { label:'Owed',  value:'$3,333.50', sub:'Due Mon 12/14',                  cls:'red-t' },
+    { label:'Pen budget',  value:'$72,500',   sub:'+ terps · ~$14.50/kit',           cls:'yellow-t' },
+    { label:'Revenue',   value:'$0',        sub:'First drop 12/1',                 cls:'green-t' },
   ],
+
+  cashOut: [
+    { date:'2026-10-21', text:'Pen boxes + devices deposit (on $28,500)', amount:'⚠️ TBD' },
+    { date:'2026-11-15', text:'Terpenes (10 flavors)',                   amount:'⚠️ TBD' },
+    { date:'2026-11-20', text:'Hat packaging (mailers, inserts)',        amount:'⚠️ TBD' },
+    { date:'2026-12-14', text:'Hat balance',                             amount:'$3,333.50' },
+    { date:'2026-12-15', text:'Pre-rolls, 5,000 (before negotiation)',   amount:'$35,000' },
+    { date:'2026-12-15', text:'Cat 3 distillate, 10 L',                  amount:'$9,000' },
+    { date:'2026-12-20', text:'Pen boxes + devices balance (before ship)',amount:'⚠️ TBD' },
+  ],
+  cashKnownTotal: '$47,333.50 + deposits/terps/packaging',
 
   hats: {
     sold: 0,              // ← update with Shopify pre-order count
     sellable: 288,        // 300 − 12 seeded
     breakEven: 106,
     styles: [
-      { name:'Duffles Club',      emoji:'♣️', units:100 },
+      { name:'Duffles Club',      emoji:'🎟️', units:100 },
       { name:'Duffles Lightning', emoji:'⚡', units:100 },
       { name:'Duffle Boys Flame', emoji:'🔥', units:100 },
     ],
@@ -238,6 +256,7 @@ const DEFAULTS = {
       ['Early access','Mon 11/30 12pm'], ['Drop','Tue 12/1 12pm PT'],
       ['Stock arrives','Mon 12/14'], ['Ships by','Fri 12/18'],
       ['Limit','2 per style'], ['Restock','None'],
+      ['Sold out','$15,000 (~$9,725 profit)'], ['Break-even','106 hats'],
     ],
   },
 
@@ -364,6 +383,15 @@ function renderMoney(){
     <div class="stat-sub">${m.sub}</div></div>`).join('');
 }
 
+function renderCash(){
+  const list = DATA.cashOut || DEFAULTS.cashOut;
+  $('cash-list').innerHTML = list.map(c=>{
+    const d=daysUntil(c.date);
+    if(d<-3) return '';
+    return `<div class="cash ${d>=0&&d<=7?'soon':''}"><span class="cd8">${fmt(c.date)}</span><span>${c.text}</span><span class="amt">${c.amount}</span></div>`;
+  }).join('') + `<div class="cash-total"><span>Known total ahead</span><span class="red-t">${DATA.cashKnownTotal || DEFAULTS.cashKnownTotal}</span></div>`;
+}
+
 /* HATS */
 function renderHats(){
   const h=DATA.hats;
@@ -385,13 +413,13 @@ function renderHats(){
 
 /* PEN STEPS */
 function renderPenSteps(){
-  let nextFound=false;
-  $('pen-steps').innerHTML = DATA.penSteps.map(s=>{
-    let cls='', icon='○';
-    if(s.done){cls='done';icon='✅';}
-    else if(!nextFound){cls='next';icon='🔴';nextFound=true;}
-    return `<div class="step ${cls}"><span>${icon}</span><span class="step-date">${fmt(s.date)}</span><span class="step-text">${s.text}</span></div>`;
-  }).join('');
+  const doneSteps=DATA.penSteps.filter(x=>x.done), open=DATA.penSteps.filter(x=>!x.done);
+  let html='';
+  if(doneSteps.length){
+    html+=`<div class="step done"><span>✅</span><span class="step-date">${doneSteps.length} done</span><span class="step-text">${doneSteps.map(x=>x.text).join(' · ')}</span></div>`;
+  }
+  html+=open.map((x,i)=>`<div class="step ${i===0?'next':''}"><span>${i===0?'🔴':'○'}</span><span class="step-date">${fmt(x.date)}</span><span class="step-text">${x.text}</span></div>`).join('');
+  $('pen-steps').innerHTML=html;
   const d=daysUntil('2027-01-29');
   $('pen-pill').textContent = `In market in ${d} days`;
 }
@@ -464,7 +492,7 @@ async function save(){
   }catch(e){ console.error('Convex save failed:', e); }
 }
 
-function renderAll(){ renderCountdowns(); renderMoney(); renderHats(); renderPenSteps(); renderFlavors(); renderTodos(); }
+function renderAll(){ renderCountdowns(); renderMoney(); renderCash(); renderHats(); renderPenSteps(); renderFlavors(); renderTodos(); }
 
 // Draw immediately from defaults so the TV is never blank, then hydrate from Convex.
 updateClock(); setInterval(updateClock,1000);
