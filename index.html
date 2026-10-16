@@ -438,7 +438,7 @@ function renderFlavors(){
 /* TODOS: click to check off. Synced live via Convex (all screens). */
 window.toggleTodo = async function(id){
   const t = DATA.todos.find(x=>x.id===id); if(!t) return;
-  t.done = !t.done; renderTodos(); await save();
+  t.done = !t.done; t.doneAt = t.done ? new Date().toISOString() : null; renderTodos(); await save();
 };
 window.editSold = async function(){
   const v = prompt('Hat pre-orders sold so far?', DATA.hats.sold);
