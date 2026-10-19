@@ -165,10 +165,10 @@ header{display:flex;justify-content:space-between;align-items:center;flex-shrink
 
   <!-- HAT DROP -->
   <div class="card">
-    <div class="card-header"><span class="card-title">🧢 Hat Drop · Pre-order</span><span class="pill" id="hat-pill">Tue 12/1</span></div>
+    <div class="card-header"><span class="card-title">🧢 Hat Drop · In-stock · Local</span><span class="pill" id="hat-pill">Sat 12/19</span></div>
     <div class="hat-styles" id="hat-styles"></div>
     <div style="font-size:11px;font-weight:700;display:flex;justify-content:space-between">
-      <span>Pre-orders sold</span><span id="hat-sold-label" onclick="editSold()" style="cursor:pointer" title="Click to update">0 / 288</span>
+      <span>Hats sold</span><span id="hat-sold-label" onclick="editSold()" style="cursor:pointer" title="Click to update">0 / 288</span>
     </div>
     <div class="progress-wrap">
       <div class="bar-bg"><div class="bar-fill" id="hat-bar" style="width:0%"></div></div>
@@ -243,7 +243,8 @@ const DEFAULTS = {
   cashKnownTotal: '$47,333.50 + deposits/terps/packaging',
 
   hats: {
-    sold: 0,              // ← update with Shopify pre-order count
+    dropDate: '2026-12-19',
+    sold: 0,              // ← update with hats sold
     sellable: 288,        // 300 − 12 seeded
     breakEven: 106,
     styles: [
@@ -406,7 +407,7 @@ function renderHats(){
   $('be-label').style.left=bePct+'%';
   $('hat-sold-label').textContent=`${h.sold} / ${h.sellable}${h.sold>=h.breakEven?'  ✅ break-even':''}`;
   $('hat-facts').innerHTML=h.facts.map(([k,v])=>`<div><span>${k}:</span> <b>${v}</b></div>`).join('');
-  const d=daysUntil('2026-12-01');
+  const d=daysUntil(DATA.hats.dropDate || '2026-12-19');
   $('hat-pill').textContent = d>0 ? `Drops in ${d} days` : d===0 ? 'DROP DAY' : 'Live / shipped';
   $('hat-pill').className = 'pill' + (d<=7 && d>=0 ? ' red' : '');
 }
@@ -441,7 +442,7 @@ window.toggleTodo = async function(id){
   t.done = !t.done; t.doneAt = t.done ? new Date().toISOString() : null; renderTodos(); await save();
 };
 window.editSold = async function(){
-  const v = prompt('Hat pre-orders sold so far?', DATA.hats.sold);
+  const v = prompt('Hats sold so far?', DATA.hats.sold);
   if(v===null) return; const n = parseInt(v,10); if(isNaN(n)||n<0) return;
   DATA.hats.sold = n; renderHats(); await save();
 };
